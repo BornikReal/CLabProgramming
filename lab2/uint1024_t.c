@@ -33,7 +33,7 @@ struct uint1024_t from_uint(unsigned int x) {
 struct uint1024_t add_op(struct uint1024_t x, struct uint1024_t y) {
     int buffer = 0;
     struct uint1024_t result;
-    result.last_pos = pos(x.last_pos, y.last_pos);
+    result.last_pos = pos(x.last_pos + 1, y.last_pos + 1);
     for (int i = 0; i < result.last_pos; i++) {
         result.num[i] = (x.num[i] + y.num[i] + buffer) % 100;
         buffer = (x.num[i] + y.num[i] + buffer) / 100;
@@ -44,7 +44,7 @@ struct uint1024_t add_op(struct uint1024_t x, struct uint1024_t y) {
 struct uint1024_t subtr_op(struct uint1024_t x, struct uint1024_t y) {
     int buffer = 0;
     struct uint1024_t result;
-    result.last_pos = pos(x.last_pos, y.last_pos);
+    result.last_pos = pos(x.last_pos + 1, y.last_pos + 1);
     for (int i = 0; i < result.last_pos; i++) {
         result.num[i] = (100 + x.num[i] - y.num[i] - buffer) % 100;
         buffer = ((x.num[i] - y.num[i] - buffer) < 0 ? 1 : 0);
@@ -53,8 +53,10 @@ struct uint1024_t subtr_op(struct uint1024_t x, struct uint1024_t y) {
 }
 
 void printf_value(struct uint1024_t x) {
-    for (int i = (x.last_pos - 1); i >= 0; i--)
+    for (int i = (x.last_pos - 1); i >= 0; i--) {
+        if ((x.num[i] < 10) && (i != (x.last_pos - 1))) printf("0");
         printf("%d", x.num[i]);
+    }
 }
 
 void scanf_value(struct uint1024_t* x) {
@@ -84,9 +86,9 @@ void scanf_value(struct uint1024_t* x) {
 int main() {
     struct uint1024_t t1, t;
     // scanf_value(&t);
-    t1 = from_uint(100000);
-    t = from_uint(145);
-    t = subtr_op(t1, t);
+    t1 = from_uint(9999);
+    t = from_uint(1);
+    t = add_op(t1, t);
     printf_value(t);
     // char s[309];
     // itoa(2131241241234234243534, s, 10);
