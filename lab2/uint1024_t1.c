@@ -28,7 +28,7 @@ uint1024_t from_uint(unsigned int x) {
     uint1024_t result;
     if (x == 0) {
         result.last_pos = 1;
-        for (uint8_t i = 0; i < 129; i++)
+        for (int i = 0; i < 129; i++)
             result.num[i] = 0;
             return result;
     }
@@ -40,7 +40,7 @@ uint1024_t from_uint(unsigned int x) {
         pos++;
     }
     result.last_pos = pos;
-    for (uint8_t i = pos; i < 129; i++)
+    for (int i = pos; i < 129; i++)
         result.num[i] = 0;
     return result;
 }
@@ -48,14 +48,14 @@ uint1024_t from_uint(unsigned int x) {
 uint1024_t add_op(uint1024_t x, uint1024_t y) {
     uint8_t buffer = 0;
     x.last_pos = pos(x.last_pos, y.last_pos);
-    for (uint8_t i = 0; i < x.last_pos; i++) {
+    for (int i = 0; i < x.last_pos; i++) {
         uint8_t temp = buffer;
         buffer = (x.num[i] + y.num[i] + buffer) / 256;
         x.num[i] = (x.num[i] + y.num[i] + temp) % 256;
     }
     if (x.num[x.last_pos - 1] == 0)
         x.last_pos--;
-    for (uint8_t i = x.last_pos; i < 128; i++)
+    for (int i = x.last_pos; i < 129; i++)
         x.num[i] = 0;
     return x;
 }
@@ -63,18 +63,18 @@ uint1024_t add_op(uint1024_t x, uint1024_t y) {
 uint1024_t subtr_op(uint1024_t x, uint1024_t y) {
     uint8_t buffer = 0;
     x.last_pos = pos(x.last_pos, y.last_pos);
-    for (uint8_t i = 0; i < x.last_pos; i++) {
+    for (int i = 0; i < x.last_pos; i++) {
         uint8_t temp = buffer;
         buffer = ((x.num[i] - y.num[i] - buffer) < 0 ? 1 : 0);
         x.num[i] = (256 + x.num[i] - y.num[i] - temp) % 256;
     }
-    for (uint8_t i = (x.last_pos - 1); i > 0; i--) {
+    for (int i = (x.last_pos - 1); i > 0; i--) {
         if (x.num[i] == 0)
             x.last_pos--;
         else
             break;
     }
-    for (uint8_t i = x.last_pos; i < 128; i++)
+    for (int i = x.last_pos; i < 129; i++)
         x.num[i] = 0;
     return x;
 }
@@ -82,7 +82,7 @@ uint1024_t subtr_op(uint1024_t x, uint1024_t y) {
 uint1024_t mult_op(uint1024_t x, uint1024_t y) {
     int buffer;
     uint1024_t result = from_uint(0), temp;
-    for (uint8_t i = 0; i < x.last_pos; i++) {
+    for (int i = 0; i < x.last_pos; i++) {
         temp = from_uint(0);
         buffer = 0;
         for (uint8_t j = 0; j < y.last_pos; j++) {
@@ -122,10 +122,6 @@ void scanf_value(uint1024_t* x) {
     }
 }
 
-// void longadd(uint8_t *x) {
-//     int buffer = 0;
-// }
-
 void printf_value(uint1024_t x) {
     // printf("%d\n", x.last_pos);
     for (int i = (x.last_pos - 1); i >= 0; i--) {
@@ -151,7 +147,7 @@ bool compare_op(uint1024_t x, uint1024_t y) {
     else if (x.last_pos < y.last_pos)
         return -1;
     else {
-        for (uint8_t i = (x.last_pos - 1); i >= 0; i--) {
+        for (int i = (x.last_pos - 1); i >= 0; i--) {
             if (x.num[i] > y.num[i])
                 return 1;
             else if (x.num[i] < y.num[i])
@@ -171,19 +167,37 @@ uint1024_t getpart_op(uint1024_t x, uint8_t len) {
     return result;
 }
 
+uint1024_t subtr_first_op(uint1024_t x, uint1024_t y) {
+    uint8_t buffer = 0;
+    for (int i = 0; i < y.last_pos; i++) {
+        uint8_t temp = buffer;
+        buffer = ((x.num[x.last_pos - y.last_pos + i] - y.num[i] - buffer) < 0 ? 1 : 0);
+        x.num[x.last_pos - y.last_pos + i] = (256 + x.num[x.last_pos - y.last_pos + i] - y.num[i] - temp) % 256;
+    }
+    for (int i = (x.last_pos - 1); i > 0; i--) {
+        if (x.num[i] == 0)
+            x.last_pos--;
+        else
+            break;
+    }
+    for (int i = x.last_pos; i < 129; i++)
+        x.num[i] = 0;
+    return x;
+}
+
 // uint1024_t del_op(uint1024_t x, uint1024_t y) {
 //     uint8_t pos = x.last_pos;
 //     if (compare_op(x, y) != 1)
 //         return from_uint(0);
 //     else {
 //         while (pos > 0) {
-
+//             uint1024_t temp = ;
 //         }
 //     }
 
 //     int buffer;
 //     uint1024_t result = from_uint(0), temp;
-//     for (uint8_t i = 0; i < x.last_pos; i++) {
+//     for (int i = 0; i < x.last_pos; i++) {
 //         temp = from_uint(0);
 //         buffer = 0;
 //         for (uint8_t j = 0; j < y.last_pos; j++) {
@@ -208,7 +222,7 @@ int main() {
     // t = mult_op(t, from_uint(10));
     // scanf_value(&t);
     // printf_value(t);
-    uint1024_t sum, sub, mult, t = from_uint(2547128), t1 = from_uint(256);
+    uint1024_t sum, sub, mult, t = from_uint(900), t1 = from_uint(2);
     // for (int i = 1; i < 1024; i++) {
     //     t = mult_op(t, t1);
     // }
@@ -217,8 +231,10 @@ int main() {
     // printf_value(t);
     // uint1024_t t = from_uint(15000), t1 = from_uint(21), sum, sub, mult;
     printf_value(t);
-    printf_value(getpart_op(t, 4));
-    // printf_value(t1);
+    printf_value(t1);
+    t = subtr_first_op(t, t1);
+    printf_value(t);
+    // printf_value(getpart_op(t, 4));
     // sum = add_op(t1, t);
     // sub = subtr_op(t, t1);
     // mult = mult_op(t, t1);
