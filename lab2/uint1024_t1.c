@@ -139,6 +139,50 @@ void printf_value(uint1024_t x) {
     printf("\n");
 }
 
+bool compare_op(uint1024_t x, uint1024_t y) {
+    if (x.last_pos > y.last_pos)
+        return 1;
+    else if (x.last_pos < y.last_pos)
+        return -1;
+    else {
+        for (uint8_t i = (x.last_pos - 1); i > 0; i--) {
+            if (x.num[i] > y.num[i])
+                return 1;
+            else if (x.num[i] < y.num[i])
+                return -1;
+        }
+        return 0;
+    }
+}
+
+// uint1024_t del_op(uint1024_t x, uint1024_t y) {
+//     uint8_t pos = x.last_pos;
+//     while (pos > 0) {
+
+//     }
+
+
+//     int buffer;
+//     uint1024_t result = from_uint(0), temp;
+//     for (uint8_t i = 0; i < x.last_pos; i++) {
+//         temp = from_uint(0);
+//         buffer = 0;
+//         for (uint8_t j = 0; j < y.last_pos; j++) {
+//             temp.num[i] = (x.num[i] * y.num[j] + buffer) % 256;
+//             buffer = (x.num[i] * y.num[j] + buffer) / 256;
+//         }
+//         temp.last_pos = y.last_pos + i;
+//         if (buffer != 0) {
+//             temp.num[temp.last_pos] += (buffer % 256);
+//             temp.last_pos++;
+//         }
+//         // printf_value(temp);
+//         result = add_op(result, temp);
+//     }
+//     if ((result.num[result.last_pos - 1] == 0) && (result.last_pos != 1))
+//         result.last_pos--;
+//     return result;
+// }
 
 int main() {
     // uint1024_t t = from_uint(0);
