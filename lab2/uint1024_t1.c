@@ -141,7 +141,7 @@ void printf_value(uint1024_t x) {
     printf("\n");
 }
 
-bool compare_op(uint1024_t x, uint1024_t y) {
+int compare_op(uint1024_t x, uint1024_t y) {
     if (x.last_pos > y.last_pos)
         return 1;
     else if (x.last_pos < y.last_pos)
@@ -167,73 +167,81 @@ uint1024_t getpart_op(uint1024_t x, uint8_t len) {
     return result;
 }
 
-uint1024_t subtr_first_op(uint1024_t x, uint1024_t y) {
-    uint8_t buffer = 0;
-    for (int i = 0; i < y.last_pos; i++) {
-        uint8_t temp = buffer;
-        buffer = ((x.num[x.last_pos - y.last_pos + i] - y.num[i] - buffer) < 0 ? 1 : 0);
-        x.num[x.last_pos - y.last_pos + i] = (256 + x.num[x.last_pos - y.last_pos + i] - y.num[i] - temp) % 256;
+uint8_t subtr_first_op(uint1024_t *x, uint1024_t y) {
+    uint8_t buffer = 0, additional = 0, num = 0;
+    if (compare_op(*x, y) != 1)
+        return 0;
+    if (compare_op(getpart_op(*x, y.last_pos), y) == -1)
+        additional++;
+    uint1024_t temp = getpart_op(*x, y.last_pos + additional), temp1;
+    unsigned t = 1;
+    for (int i = 1; i <= (x -> last_pos - y.last_pos - additional); i++)
+        t *= 256;
+    if (compare_op(*x, mult_op(temp, from_uint(t))) != -1)
+        temp1 = subtr_op(*x, mult_op(temp, from_uint(t)));
+    else
+        temp1 = from_uint(0);
+    while (compare_op(temp, y) == 1)
+    {
+        temp = subtr_op(temp, y);
+        num++;
     }
-    for (int i = (x.last_pos - 1); i > 0; i--) {
-        if (x.num[i] == 0)
-            x.last_pos--;
-        else
-            break;
-    }
-    for (int i = x.last_pos; i < 129; i++)
-        x.num[i] = 0;
-    return x;
+    *x = add_op(mult_op(temp, from_uint(t)), temp1);
+    return num;
 }
 
-// uint1024_t del_op(uint1024_t x, uint1024_t y) {
-//     uint8_t pos = x.last_pos;
-//     if (compare_op(x, y) != 1)
-//         return from_uint(0);
-//     else {
-//         while (pos > 0) {
-//             uint1024_t temp = ;
-//         }
-//     }
+uint1024_t del_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0);
+    uint8_t t = 1;
+    if (compare_op(x, y) != 1)
+        return from_uint(0);
+    else {
+        while (t != 0) {
+            t = subtr_first_op(&x, y);
+            if (t > 0)
+                result = add_op(mult_op(result, from_uint(256)), from_uint(t));
+        }
+    }
+    return result;
+}
 
-//     int buffer;
-//     uint1024_t result = from_uint(0), temp;
-//     for (int i = 0; i < x.last_pos; i++) {
-//         temp = from_uint(0);
-//         buffer = 0;
-//         for (uint8_t j = 0; j < y.last_pos; j++) {
-//             temp.num[i] = (x.num[i] * y.num[j] + buffer) % 256;
-//             buffer = (x.num[i] * y.num[j] + buffer) / 256;
-//         }
-//         temp.last_pos = y.last_pos + i;
-//         if (buffer != 0) {
-//             temp.num[temp.last_pos] += (buffer % 256);
-//             temp.last_pos++;
-//         }
-//         // printf_value(temp);
-//         result = add_op(result, temp);
-//     }
-//     if ((result.num[result.last_pos - 1] == 0) && (result.last_pos != 1))
-//         result.last_pos--;
-//     return result;
-// }
+uint1024_t mod_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0);
+    uint8_t t;
+    if (compare_op(x, y) != 1)
+        return from_uint(0);
+    else {
+        while (t != 0) {
+            t = subtr_first_op(&x, y);
+            if (t > 0)
+                result = add_op(mult_op(result, from_uint(256)), from_uint(t));
+        }
+    }
+    return x;
+}
 
 int main() {
     // uint1024_t t = from_uint(0);
     // t = mult_op(t, from_uint(10));
     // scanf_value(&t);
     // printf_value(t);
-    uint1024_t sum, sub, mult, t = from_uint(900), t1 = from_uint(2);
+    // uint1024_t t = from_uint(12342412), t1 = from_uint(23424);
+    // printf_value(t);
+    // printf_value(t1);
+    // t = del_op(t, t1);
+    // t = mod_op(t, t1);
+    // printf_value(t);
+    // printf("%d", subtr_first_op(&t, t1));
     // for (int i = 1; i < 1024; i++) {
     //     t = mult_op(t, t1);
     // }
     // printf_value(t);
     // t = mult_op(t, t1);
-    // printf_value(t);
     // uint1024_t t = from_uint(15000), t1 = from_uint(21), sum, sub, mult;
-    printf_value(t);
-    printf_value(t1);
-    t = subtr_first_op(t, t1);
-    printf_value(t);
+    // printf_value(t);
+    // printf_value(t1);
+    // t = subtr_first_op(t, t1);
+    // printf_value(t);
     // printf_value(getpart_op(t, 4));
     // sum = add_op(t1, t);
     // sub = subtr_op(t, t1);
