@@ -122,25 +122,6 @@ void scanf_value(uint1024_t* x) {
     }
 }
 
-// void printf_value(uint1024_t x) {
-//     // printf("%d\n", x.last_pos);
-//     for (int i = (x.last_pos - 1); i >= 0; i--) {
-//         printf("%d ", x.num[i]);
-//     }
-//     // for (int i = 128; i >= 0; i--) {
-//     //     printf("%d ", x.num[i]);
-//     // }
-// //     uint8_t input[309];
-// //     int buffer = 0;
-// //     for (int i = 0; i < 309; i++)
-// //         input[i] = 0;
-// //     // for (int i = 0; i < 309; i++) {
-// //         // result.num[i] = (x.num[i] + y.num[i] + buffer) % 256;
-// //         // buffer = (x.num[i] + y.num[i] + buffer) / 256;
-// //     // }
-//     printf("\n");
-// }
-
 int compare_op(uint1024_t x, uint1024_t y) {
     if (x.last_pos > y.last_pos)
         return 1;
@@ -203,7 +184,7 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
 
 uint1024_t mod_op(uint1024_t x, uint1024_t y) {
     uint1024_t result = from_uint(0);
-    uint8_t t;
+    uint8_t t = 1;
     while (t != 0) {
         t = subtr_first_op(&x, y);
         if (t > 0)
@@ -212,9 +193,18 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
     return x;
 }
 
-// void printf_value(uint1024_t x) {
-
-// }
+void printf_value(uint1024_t x) {
+    uint8_t output[309], pos = 0;
+    uint1024_t zero = from_uint(0), ten = from_uint(10);
+    while (compare_op(x, zero) == 1) {
+        output[pos] = mod_op(x, ten).num[0];
+        x = del_op(x, ten);
+        pos++;
+    }
+    for (int i = (pos - 1); i >= 0; i--)
+        printf("%d", output[i]);
+    printf("\n");
+}
 
 int main() {
     // uint1024_t t = from_uint(213), t1 = from_uint(12312);
@@ -224,11 +214,11 @@ int main() {
     // t = mult_op(t, from_uint(10));
     // scanf_value(&t);
     // printf_value(t);
-    // uint1024_t t = from_uint(12342412), t1 = from_uint(23424);
-    // printf_value(t);
-    // printf_value(t1);
+    uint1024_t t = from_uint(12342412), t1 = from_uint(23424), ten = from_uint(10);
+    printf_value(t);
+    printf_value(t1);
     // t = del_op(t, t1);
-    // t = mod_op(t, t1);
+    // t = mod_op(t1, ten);
     // printf_value(t);
     // printf("%d", subtr_first_op(&t, t1));
     // for (int i = 1; i < 1024; i++) {
