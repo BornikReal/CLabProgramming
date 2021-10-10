@@ -131,6 +131,7 @@ void shift(uint1024_t *x) {
     for (int i = pos; i >= 1; i--)
         x->num[i] = x->num[i - 1];
     x->num[0]=0;
+    x->last_pos = x->last_pos + 1;
 }
 
 int compare_op(uint1024_t x, uint1024_t y) {
@@ -149,45 +150,9 @@ int compare_op(uint1024_t x, uint1024_t y) {
     }
 }
 
-// uint1024_t getpart_op(uint1024_t x, uint8_t len) {
-//     uint1024_t result = from_uint(0);
-//     if ((len == 0) || (x.last_pos < len))
-//         return result;
-//     result.last_pos = len;
-//     for (int i = (len - 1); i >= 0; i--)
-//         result.num[i] = x.num[x.last_pos - (len - i)];
-//     return result;
-// }
-
-// uint8_t subtr_first_op(uint1024_t *x, uint1024_t y) {
-//     uint8_t buffer = 0, additional = 0, num = 0;
-//     if (compare_op(*x, y) != 1)
-//         return 0;
-//     if (compare_op(getpart_op(*x, y.last_pos), y) == -1)
-//         additional++;
-//     uint1024_t temp = getpart_op(*x, y.last_pos + additional), temp1;
-//     uint1024_t tt = temp;
-//     for (int i = 1; i <= (x -> last_pos - y.last_pos - additional); i++)
-//         shift(&tt);
-//     if (compare_op(*x, tt) != -1)
-//         temp1 = subtr_op(*x, tt);
-//     else
-//         temp1 = from_uint(0);
-//     while (compare_op(temp, y) != -1)
-//     {
-//         temp = subtr_op(temp, y);
-//         num++;
-//     }
-//     for (int i = 1; i <= (x -> last_pos - y.last_pos - additional); i++)
-//         shift(&temp);
-//     *x = add_op(temp, temp1);
-//     printfold(*x);
-//     return num;
-// }
-
 uint1024_t small_del_op(uint1024_t x, uint1024_t y) {
     uint1024_t result = from_uint(0), one = from_uint(1);
-    while (compare_op(x, y) == 1)
+    while (compare_op(x, y) != -1)
     {
         x = subtr_op(x, y);
         result = add_op(result, one);
@@ -197,7 +162,7 @@ uint1024_t small_del_op(uint1024_t x, uint1024_t y) {
 
 uint1024_t small_mod_op(uint1024_t x, uint1024_t y) {
     uint1024_t result = from_uint(0), one = from_uint(1);
-    while (compare_op(x, y) == 1)
+    while (compare_op(x, y) != -1)
     {
         x = subtr_op(x, y);
         result = add_op(result, one);
@@ -240,16 +205,37 @@ uint1024_t merge(uint1024_t x, uint1024_t y) {
     return result;
 }
 
-// uint1024_t del_op(uint1024_t x, uint1024_t y) {
-//     uint1024_t result = from_uint(0);
-//     int pos = x.last_pos;
-//     while (pos > 0) {
-//         uint1024_t temp = getlastpart_op(x, y.last_pos);
-//         if (compare_op(temp, y) == -1)
-//             temp = getlastpart_op(x, y.last_pos + 1);
-        
-//     }
-// }
+uint1024_t del_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0), temp, other, current;
+    int pos = x.last_pos, temp_pos = 0;
+    temp = getlastpart_op(x, y.last_pos);
+    other = getfirstpart_op(x, (x.last_pos - y.last_pos));
+    pos -= y.last_pos;
+    if (compare_op(temp, y) == -1) {
+        temp = getlastpart_op(x, y.last_pos + 1);
+        other = getfirstpart_op(x, (x.last_pos - (y.last_pos + 1)));
+        pos--;
+    }
+    result = small_del_op(temp, y);
+    current = small_mod_op(temp, y);
+    for (int i = (other.last_pos - 1); i >= 0; i--) {
+        if (other.num[i] == 0) {
+            shift(&result);
+            temp_pos++;
+        }
+    }
+    other = getfirstpart_op(other, (other.last_pos - temp_pos));
+    while (compare_op(other, y) != -1) {
+        current = merge(current, getlastpart_op(other, 1));
+        shift(&result);
+        if (compare_op(current, y) != -1) {
+            result = add_op(result, small_del_op(current, y));
+            current = small_mod_op(current, y);
+        }
+        other = getfirstpart_op(other, (other.last_pos - 1));
+    }
+    return result;
+}
 
 // uint1024_t del_op(uint1024_t x, uint1024_t y) {
 //     uint1024_t result = from_uint(0);
@@ -297,10 +283,13 @@ void printfold(uint1024_t x) {
 // }
 
 int main() {
-    // uint1024_t t = from_uint(1173298517);
+    uint1024_t a = from_uint(10244), b = from_uint(2), r;
+    printfold(a);
+    printfold(b);
+    r = del_op(a, b);
+    printfold(r);
+    // uint1024_t t = from_uint(1);
+    // shift(&t);
     // printfold(t);
-    // uint1024_t a = getlastpart(t, 2);
-    // uint1024_t b = getfirstpart(t, 2);
-    // printfold(merge(a, b));
     return 0;
 }
