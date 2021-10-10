@@ -206,6 +206,10 @@ uint1024_t merge(uint1024_t x, uint1024_t y) {
 }
 
 uint1024_t del_op(uint1024_t x, uint1024_t y) {
+    if (compare_op(x, y) == -1)
+        return from_uint(0);
+    else if (compare_op(x, y) == 0)
+        return from_uint(1);
     uint1024_t result = from_uint(0), zero = from_uint(0), temp, other, current;
     int pos = x.last_pos, temp_pos = 0;
     temp = getlastpart_op(x, y.last_pos);
@@ -218,10 +222,12 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
     }
     result = small_del_op(temp, y);
     current = small_mod_op(temp, y);
-    for (int i = (other.last_pos - 1); i >= 0; i--) {
-        if (other.num[i] == 0) {
-            shift(&result);
-            temp_pos++;
+    if (other.last_pos != 1) {
+        for (int i = (other.last_pos - 1); i >= 0; i--) {
+            if (other.num[i] == 0) {
+                shift(&result);
+                temp_pos++;
+            }
         }
     }
     other = getfirstpart_op(other, (other.last_pos - temp_pos));
@@ -240,6 +246,10 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
 }
 
 uint1024_t mod_op(uint1024_t x, uint1024_t y) {
+    if (compare_op(x, y) == -1)
+        return x;
+    else if (compare_op(x, y) == 0)
+        return from_uint(0);
     uint1024_t zero = from_uint(0), temp, other, current;
     int pos = x.last_pos, temp_pos = 0;
     temp = getlastpart_op(x, y.last_pos);
@@ -251,9 +261,11 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
         pos--;
     }
     current = small_mod_op(temp, y);
-    for (int i = (other.last_pos - 1); i >= 0; i--)
-        if (other.num[i] == 0)
-            temp_pos++;
+    if (other.last_pos != 1) {
+        for (int i = (other.last_pos - 1); i >= 0; i--)
+            if (other.num[i] == 0)
+                temp_pos++;
+    }
     other = getfirstpart_op(other, (other.last_pos - temp_pos));
     while (compare_op(other, zero) == 1) {
         current = merge(current, getlastpart_op(other, 1));
@@ -272,19 +284,21 @@ void printfold(uint1024_t x) {
     printf("\n");
 }
 
-// void printf_value(uint1024_t x) {
-//     uint8_t output[309], pos = 0;
-//     uint1024_t zero = from_uint(0), ten = from_uint(10);
-//     while (compare_op(x, zero) == 1) {
-//         output[pos] = mod_op(x, ten).num[0];
-//         x = del_op(x, ten);
-//         pos++;
-//     }
-//     for (int i = (pos - 1); i >= 0; i--)
-//         printf("%d", output[i]);
-//     printf("\n");
-// }
+void printf_value(uint1024_t x) {
+    uint8_t output[309], pos = 0;
+    uint1024_t zero = from_uint(0), ten = from_uint(10);
+    while (compare_op(x, zero) == 1) {
+        output[pos] = mod_op(x, ten).num[0];
+        x = del_op(x, ten);
+        pos++;
+    }
+    for (int i = (pos - 1); i >= 0; i--)
+        printf("%d", output[i]);
+    printf("\n");
+}
 
 int main() {
+    uint1024_t a = from_uint(1243123123);
+    printf_value(a);
     return 0;
 }
