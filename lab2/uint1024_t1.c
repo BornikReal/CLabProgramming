@@ -122,39 +122,40 @@ void scanf_value(uint1024_t* x) {
     }
 }
 
-void shift(uint1024_t *x, int pos) {
+uint1024_t shift(uint1024_t x, int pos) {
     if (pos < 0) {
         pos = -pos;
-        if (x->last_pos <= pos)
-            *x = from_uint(0);
+        if (x.last_pos <= pos)
+            x = from_uint(0);
         else {
-            x->last_pos = x->last_pos - pos;
-            for (int i = 0; i < x->last_pos; i++)
-                x->num[i] = x->num[i + pos];
-            for (int i = x->last_pos; i <= 128; i++)
-                x->num[i] = 0;
-            for (int i = x->last_pos - 1; i > 0; i--) {
-                if (x->num[i] == 0)
-                    x->last_pos--;
+            x.last_pos = x.last_pos - pos;
+            for (int i = 0; i < x.last_pos; i++)
+                x.num[i] = x.num[i + pos];
+            for (int i = x.last_pos; i <= 128; i++)
+                x.num[i] = 0;
+            for (int i = x.last_pos - 1; i > 0; i--) {
+                if (x.num[i] == 0)
+                    x.last_pos--;
                 else
                     break;
             }
         }
     }
     else {
-        if ((x->last_pos + pos - 1) < 129)
-            x->last_pos = x->last_pos + pos;
-        for (int i = (x->last_pos - 1); i >= pos; i--)
-            x->num[i] = x->num[i - pos];
+        if ((x.last_pos + pos - 1) < 129)
+            x.last_pos = x.last_pos + pos;
+        for (int i = (x.last_pos - 1); i >= pos; i--)
+            x.num[i] = x.num[i - pos];
         for (int i = (pos - 1); i >= 0; i--)
-            x->num[i] = 0;
-        for (int i = x->last_pos - 1; i > 0; i--) {
-            if (x->num[i] == 0)
-                x->last_pos--;
+            x.num[i] = 0;
+        for (int i = x.last_pos - 1; i > 0; i--) {
+            if (x.num[i] == 0)
+                x.last_pos--;
             else
                 break;
         }
     }
+    return x;
 }
 
 int compare_op(uint1024_t x, uint1024_t y) {
@@ -226,28 +227,32 @@ uint1024_t merge(uint1024_t x, uint1024_t y) {
     return result;
 }
 
-// uint1024_t betamult_op(uint1024_t x, uint1024_t y) {
-//     uint1024_t result = from_uint(0);
-//     if (x.last_pos == 1) {
-//         result.num[0] = (x.num[0] * y.num[0]) % 256;
-//         result.num[1] = (x.num[0] * y.num[0]) / 256;
-//         if (result.num[1] == 0)
-//             result.last_pos = 1;
-//         else
-//             result.last_pos = 2;
-//         return result;
-//     }
-//     int max_len = x.last_pos;
-//     if (y.last_pos > max_len)
-//         max_len = y.last_pos;
-//     if (max_len % 2 != 0)
-//         max_len++;
-//     uint1024_t x1 = getfirstpart_op(x, max_len / 2), x2 = getlastpart_op(x, max_len / 2);
-//     uint1024_t y1 = getfirstpart_op(y, max_len / 2), y2 = getlastpart_op(y, max_len / 2);
-//     uint1024_t sum1 = add_op(x1, x2), sum2 = add_op(y1, y2);
-//     uint1024_t first = betamult_op(x1, y1), second = betamult_op(x2, y2), third = betamult_op(sum1, sum2);
-//     return result;
-// }
+uint1024_t betamult_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result;
+    if (x.last_pos == 1) {
+        result.num[0] = (x.num[0] * y.num[0]) % 256;
+        result.num[1] = (x.num[0] * y.num[0]) / 256;
+        if (result.num[1] == 0)
+            result.last_pos = 1;
+        else
+            result.last_pos = 2;
+        return result;
+    }
+    int max_len = x.last_pos;
+    if (y.last_pos > max_len)
+        max_len = y.last_pos;
+    if (max_len % 2 != 0)
+        max_len++;
+    uint1024_t x1 = getlastpart_op(x, x.last_pos - max_len / 2), x2 = getfirstpart_op(x, max_len / 2);
+    uint1024_t y1 = getlastpart_op(y, y.last_pos - max_len / 2), y2 = getfirstpart_op(y, max_len / 2);
+    uint1024_t sum1 = add_op(x1, x2), sum2 = add_op(y1, y2);
+    uint1024_t first = betamult_op(x1, y1), second = betamult_op(x2, y2), third = betamult_op(sum1, sum2);
+    third = subtr_op(third, first);
+    third = subtr_op(third, second);
+    result = add_op(shift(first, max_len * max_len), shift(third, max_len));
+    result = add_op(result, second);
+    return result;
+}
 
 uint1024_t del_op(uint1024_t x, uint1024_t y) {
     uint1024_t current, other, result = from_uint(0), zero = from_uint(0);
@@ -262,7 +267,7 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
         len = x.last_pos - (y.last_pos + 1);
     }
     while (len >= 0) {
-        shift(&result, 1);
+        result = shift(result, 1);
         for (int i = current.last_pos - 1; i > 0; i--) {
             if (current.num[i] == 0)
                 current.last_pos--;
@@ -286,7 +291,7 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
         len--;
     }
     if (len > 1)
-        shift(&result, len);
+        result = shift(result, len);
     return result;
 }
 
@@ -326,7 +331,7 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
         other = getfirstpart_op(other, (other.last_pos - 1));
         len--;
     }
-    shift(&current, -1);
+    current = shift(current, -1);
     return current;
 }
 
@@ -353,6 +358,12 @@ void printf_value(uint1024_t x) {
 }
 
 int main() {
+    // uint1024_t a = from_uint(12345678), b = from_uint(98765432), r;
+    // printfold(a);
+    // printfold(b);
+    // r = betamult_op(a, b);
+    // printfold(r);
+    // printf_value(r);
     // uint1024_t a = from_uint(123412423);
     // printfold(a);
     // shift(&a, -6);
