@@ -195,6 +195,16 @@ uint1024_t small_del_op(uint1024_t x, uint1024_t y) {
     return result;
 }
 
+uint1024_t small_mod_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0), one = from_uint(1);
+    while (compare_op(x, y) == 1)
+    {
+        x = subtr_op(x, y);
+        result = add_op(result, one);
+    }
+    return x;
+}
+
 uint1024_t getlastpart_op(uint1024_t x, uint8_t len) {
     uint1024_t result = from_uint(0);
     if ((len == 0) || (x.last_pos < len))
@@ -234,8 +244,10 @@ uint1024_t merge(uint1024_t x, uint1024_t y) {
 //     uint1024_t result = from_uint(0);
 //     int pos = x.last_pos;
 //     while (pos > 0) {
-//         uint1024_t temp = getlastpart(x, y.last_pos);
-//         if (compare_op(temp, ))
+//         uint1024_t temp = getlastpart_op(x, y.last_pos);
+//         if (compare_op(temp, y) == -1)
+//             temp = getlastpart_op(x, y.last_pos + 1);
+        
 //     }
 // }
 
