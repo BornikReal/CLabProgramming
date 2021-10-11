@@ -3,22 +3,24 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+const int Size = 129;
+
 typedef struct uint1024_t
 {
-    uint8_t num[129];
+    uint8_t num[129]; 
     uint8_t last_pos;
 } uint1024_t;
 
 uint8_t pos(uint8_t x, uint8_t y) {
     if (x > y) {
-        if ((x + 1) >= 129)
-            return 129;
+        if ((x + 1) >= Size)
+            return Size;
         else;
          return (x + 1);
     }
     else {
-        if ((y + 1) >= 129)
-            return 129;
+        if ((y + 1) >= Size)
+            return Size;
         else;
          return (y + 1);
     }
@@ -28,7 +30,7 @@ uint1024_t from_uint(unsigned int x) {
     uint1024_t result;
     if (x == 0) {
         result.last_pos = 1;
-        for (int i = 0; i < 129; i++)
+        for (int i = 0; i < Size; i++)
             result.num[i] = 0;
             return result;
     }
@@ -40,7 +42,7 @@ uint1024_t from_uint(unsigned int x) {
         pos++;
     }
     result.last_pos = pos;
-    for (int i = pos; i < 129; i++)
+    for (int i = pos; i < Size; i++)
         result.num[i] = 0;
     return result;
 }
@@ -55,7 +57,7 @@ uint1024_t add_op(uint1024_t x, uint1024_t y) {
     }
     if (x.num[x.last_pos - 1] == 0)
         x.last_pos--;
-    for (int i = x.last_pos; i < 129; i++)
+    for (int i = x.last_pos; i < Size; i++)
         x.num[i] = 0;
     return x;
 }
@@ -74,7 +76,7 @@ uint1024_t subtr_op(uint1024_t x, uint1024_t y) {
         else
             break;
     }
-    for (int i = x.last_pos; i < 129; i++)
+    for (int i = x.last_pos; i < Size; i++)
         x.num[i] = 0;
     return x;
 }
@@ -86,12 +88,12 @@ uint1024_t mult_op(uint1024_t x, uint1024_t y) {
         temp = from_uint(0);
         buffer = 0;
         for (uint8_t j = 0; j < y.last_pos; j++) {
-            if ((i + j) < 129)
+            if ((i + j) < Size)
                 temp.num[i + j] = (x.num[i] * y.num[j] + buffer) % 256;
             buffer = (x.num[i] * y.num[j] + buffer) / 256;
         }
         temp.last_pos = y.last_pos + i;
-        if ((buffer != 0) && (temp.last_pos != 129)) {
+        if ((buffer != 0) && (temp.last_pos != Size)) {
             temp.num[temp.last_pos] += (buffer % 256);
             temp.last_pos++;
         }
@@ -131,7 +133,7 @@ uint1024_t shift(uint1024_t x, int pos) {
             x.last_pos = x.last_pos - pos;
             for (int i = 0; i < x.last_pos; i++)
                 x.num[i] = x.num[i + pos];
-            for (int i = x.last_pos; i <= 128; i++)
+            for (int i = x.last_pos; i <= (Size - 1); i++)
                 x.num[i] = 0;
             for (int i = x.last_pos - 1; i > 0; i--) {
                 if (x.num[i] == 0)
@@ -142,7 +144,7 @@ uint1024_t shift(uint1024_t x, int pos) {
         }
     }
     else {
-        if ((x.last_pos + pos - 1) < 129)
+        if ((x.last_pos + pos - 1) < Size)
             x.last_pos = x.last_pos + pos;
         for (int i = (x.last_pos - 1); i >= pos; i--)
             x.num[i] = x.num[i - pos];
@@ -308,6 +310,12 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
     return current;
 }
 
+void printfold(uint1024_t x) {
+    for (int i = (x.last_pos - 1); i >= 0; i--)
+        printf("%d ", x.num[i]);
+    printf("\n");
+}
+
 void printf_value(uint1024_t x) {
     uint8_t output[309];
     int pos = 0;
@@ -315,6 +323,7 @@ void printf_value(uint1024_t x) {
     while (compare_op(x, zero) == 1) {
         output[pos] = mod_op(x, ten).num[0];
         x = del_op(x, ten);
+        printfold(x);
         pos++;
     }
     for (int i = (pos - 1); i >= 0; i--)
@@ -323,5 +332,10 @@ void printf_value(uint1024_t x) {
 }
 
 int main() {
+    uint1024_t a = from_uint(1), b = from_uint(2);
+    for (int i = 1; i <= 1023; i++)
+        a = mult_op(a, b);
+    printfold(a);
+    printf_value(a);
     return 0;
 }
