@@ -3,95 +3,325 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-struct uint1024_t
+typedef struct uint1024_t
 {
-    uint8_t num[155];
+    uint8_t num[129];
     uint8_t last_pos;
-};
+} uint1024_t;
 
-uint8_t pos(int x, int y) {
-    if (x > y)
-        return x;
-    else
-        return y;
+uint8_t pos(uint8_t x, uint8_t y) {
+    if (x > y) {
+        if ((x + 1) >= 129)
+            return 129;
+        else;
+         return (x + 1);
+    }
+    else {
+        if ((y + 1) >= 129)
+            return 129;
+        else;
+         return (y + 1);
+    }
 }
 
-struct uint1024_t from_uint(unsigned int x) {
-    struct uint1024_t ret;
-    int pos = 0;
-    while (x > 0) {
-        ret.num[pos] = x % 100;
+uint1024_t from_uint(unsigned int x) {
+    uint1024_t result;
+    if (x == 0) {
+        result.last_pos = 1;
+        for (int i = 0; i < 129; i++)
+            result.num[i] = 0;
+            return result;
+    }
+    uint8_t pos = 0;
+    while (x > 0)
+    {
+        result.num[pos] = x % 256;
+        x /= 256;
         pos++;
-        x /= 100;
     }
-    ret.last_pos = pos;
-    for (int i = pos; i < 155; i++)
-        ret.num[i] = 0;
-    return ret;
-}
-
-struct uint1024_t add_op(struct uint1024_t x, struct uint1024_t y) {
-    int buffer = 0;
-    struct uint1024_t result;
-    result.last_pos = pos(x.last_pos + 1, y.last_pos + 1);
-    for (int i = 0; i < result.last_pos; i++) {
-        result.num[i] = (x.num[i] + y.num[i] + buffer) % 100;
-        buffer = (x.num[i] + y.num[i] + buffer) / 100;
-    }
+    result.last_pos = pos;
+    for (int i = pos; i < 129; i++)
+        result.num[i] = 0;
     return result;
 }
 
-struct uint1024_t subtr_op(struct uint1024_t x, struct uint1024_t y) {
-    int buffer = 0;
-    struct uint1024_t result;
-    result.last_pos = pos(x.last_pos + 1, y.last_pos + 1);
-    for (int i = 0; i < result.last_pos; i++) {
-        result.num[i] = (100 + x.num[i] - y.num[i] - buffer) % 100;
+uint1024_t add_op(uint1024_t x, uint1024_t y) {
+    uint8_t buffer = 0;
+    x.last_pos = pos(x.last_pos, y.last_pos);
+    for (int i = 0; i < x.last_pos; i++) {
+        uint8_t temp = buffer;
+        buffer = (x.num[i] + y.num[i] + buffer) / 256;
+        x.num[i] = (x.num[i] + y.num[i] + temp) % 256;
+    }
+    if (x.num[x.last_pos - 1] == 0)
+        x.last_pos--;
+    for (int i = x.last_pos; i < 129; i++)
+        x.num[i] = 0;
+    return x;
+}
+
+uint1024_t subtr_op(uint1024_t x, uint1024_t y) {
+    uint8_t buffer = 0;
+    x.last_pos = pos(x.last_pos, y.last_pos);
+    for (int i = 0; i < x.last_pos; i++) {
+        uint8_t temp = buffer;
         buffer = ((x.num[i] - y.num[i] - buffer) < 0 ? 1 : 0);
+        x.num[i] = (256 + x.num[i] - y.num[i] - temp) % 256;
     }
+    for (int i = (x.last_pos - 1); i > 0; i--) {
+        if (x.num[i] == 0)
+            x.last_pos--;
+        else
+            break;
+    }
+    for (int i = x.last_pos; i < 129; i++)
+        x.num[i] = 0;
+    return x;
+}
+
+uint1024_t mult_op(uint1024_t x, uint1024_t y) {
+    int buffer;
+    uint1024_t result = from_uint(0), temp;
+    for (int i = 0; i < x.last_pos; i++) {
+        temp = from_uint(0);
+        buffer = 0;
+        for (uint8_t j = 0; j < y.last_pos; j++) {
+            if ((i + j) < 129)
+                temp.num[i + j] = (x.num[i] * y.num[j] + buffer) % 256;
+            buffer = (x.num[i] * y.num[j] + buffer) / 256;
+        }
+        temp.last_pos = y.last_pos + i;
+        if ((buffer != 0) && (temp.last_pos != 129)) {
+            temp.num[temp.last_pos] += (buffer % 256);
+            temp.last_pos++;
+        }
+        for (uint8_t j = (temp.last_pos - 1); j >= 1; j--) {
+            if (temp.num[j] == 0)
+                temp.last_pos--;
+            else
+                break;
+        }
+        result = add_op(result, temp);
+    }
+    if ((result.num[result.last_pos - 1] == 0) && (result.last_pos != 1))
+        result.last_pos--;
     return result;
 }
 
-void printf_value(struct uint1024_t x) {
-    for (int i = (x.last_pos - 1); i >= 0; i--) {
-        if ((x.num[i] < 10) && (i != (x.last_pos - 1))) printf("0");
-        printf("%d", x.num[i]);
+void scanf_value(uint1024_t* x) {
+    *x = from_uint(0);
+    char input[309];
+    scanf("%s", input);
+    int i = 0;
+    while (i < 309) {
+        if (input[i] != '\0')
+            *x = add_op(mult_op(*x, from_uint(10)), from_uint(input[i] - '0'));
+        else
+            break;
+        i++;
     }
 }
 
-void scanf_value(struct uint1024_t* x) {
-    char temp[310];
-    // x -> last_pos = 0;
-    fgets(temp, 310, stdin);
-    for (int i = 0; i < 310; i++) {
-        int digit = temp[i] - '0';
-        if ((digit < 0) || (digit > 9))
-            temp[i] = '0';
-    }
-    for (int i = 0; i < 309; i += 2) {
-        // printf("%c %c\n", temp[i], temp[i - 1]);
-        int first_dig = temp[i] - '0';
-        int second_dig = temp[i + 1] - '0';
-        printf("%d %d\n", first_dig, second_dig);
-        if ((first_dig >= 0) && (first_dig <= 9) && (second_dig >= 0) && (second_dig <= 9)) {
-            if ((first_dig == 0) && (second_dig == 0))
-                x -> last_pos = (i / 2) + 1;
-            x -> num[i / 2] = first_dig * 10 + second_dig;
+uint1024_t shift(uint1024_t x, int pos) {
+    if (pos < 0) {
+        pos = -pos;
+        if (x.last_pos <= pos)
+            x = from_uint(0);
+        else {
+            x.last_pos = x.last_pos - pos;
+            for (int i = 0; i < x.last_pos; i++)
+                x.num[i] = x.num[i + pos];
+            for (int i = x.last_pos; i <= 128; i++)
+                x.num[i] = 0;
+            for (int i = x.last_pos - 1; i > 0; i--) {
+                if (x.num[i] == 0)
+                    x.last_pos--;
+                else
+                    break;
+            }
         }
     }
-    if (x -> num[154] != 0)
-        x -> last_pos = 155;
+    else {
+        if ((x.last_pos + pos - 1) < 129)
+            x.last_pos = x.last_pos + pos;
+        for (int i = (x.last_pos - 1); i >= pos; i--)
+            x.num[i] = x.num[i - pos];
+        for (int i = (pos - 1); i >= 0; i--)
+            x.num[i] = 0;
+        for (int i = x.last_pos - 1; i > 0; i--) {
+            if (x.num[i] == 0)
+                x.last_pos--;
+            else
+                break;
+        }
+    }
+    return x;
+}
+
+int compare_op(uint1024_t x, uint1024_t y) {
+    if (x.last_pos > y.last_pos)
+        return 1;
+    else if (x.last_pos < y.last_pos)
+        return -1;
+    else {
+        for (int i = (x.last_pos - 1); i >= 0; i--) {
+            if (x.num[i] > y.num[i])
+                return 1;
+            else if (x.num[i] < y.num[i])
+                return -1;
+        }
+        return 0;
+    }
+}
+
+uint1024_t small_del_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0), one = from_uint(1);
+    while (compare_op(x, y) != -1)
+    {
+        x = subtr_op(x, y);
+        result = add_op(result, one);
+    }
+    return result;
+}
+
+uint1024_t small_mod_op(uint1024_t x, uint1024_t y) {
+    uint1024_t result = from_uint(0), one = from_uint(1);
+    while (compare_op(x, y) != -1)
+    {
+        x = subtr_op(x, y);
+        result = add_op(result, one);
+    }
+    return x;
+}
+
+uint1024_t getlastpart_op(uint1024_t x, int len) {
+    uint1024_t result = from_uint(0);
+    result.last_pos = len;
+    for (int i = (len - 1); i >= 0; i--)
+        result.num[i] = x.num[x.last_pos - (len - i)];
+    return result;
+}
+
+uint1024_t getfirstpart_op(uint1024_t x, int len) {
+    uint1024_t result = from_uint(0);
+    if ((len == 0) || (x.last_pos < len))
+        return result;
+    result.last_pos = len;
+    for (int i = (len - 1); i >= 0; i--)
+        result.num[i] = x.num[i];
+    return result;
+}
+
+uint1024_t merge(uint1024_t x, uint1024_t y) {
+    uint1024_t result;
+    result.last_pos = x.last_pos + y.last_pos;
+    int pos = result.last_pos - 1;
+    for (int i = (x.last_pos - 1); i >= 0; i--) {
+        result.num[pos] = x.num[i];
+        pos--;
+    }
+    for (int i = (y.last_pos - 1); i >= 0; i--) {
+        result.num[pos] = y.num[i];
+        pos--;
+    }
+    return result;
+}
+
+uint1024_t del_op(uint1024_t x, uint1024_t y) {
+    uint1024_t current, other, result = from_uint(0), zero = from_uint(0);
+    int len;
+    bool d;
+    current = getlastpart_op(x, y.last_pos);
+    other = getfirstpart_op(x, (x.last_pos - y.last_pos));
+    len = x.last_pos - y.last_pos;
+    if (compare_op(current, y) == -1) {
+        current = getlastpart_op(x, y.last_pos + 1);
+        other = getfirstpart_op(x, (x.last_pos - (y.last_pos + 1)));
+        len = x.last_pos - (y.last_pos + 1);
+    }
+    while (len >= 0) {
+        result = shift(result, 1);
+        for (int i = current.last_pos - 1; i > 0; i--) {
+            if (current.num[i] == 0)
+                current.last_pos--;
+            else
+                break;
+        }
+        result = add_op(result, small_del_op(current, y));
+        if (compare_op(current, y) != -1)
+            current = small_mod_op(current, y);
+        current = merge(current, getlastpart_op(other, 1));
+        d = true;
+        for (int i = other.last_pos - 1; i >= 0; i--) {
+            if (other.num[i] != 0) {
+                d = false;
+                break;
+            }
+        }
+        if ((compare_op(current, zero) == 0) && d) 
+            break;
+        other = getfirstpart_op(other, (other.last_pos - 1));
+        len--;
+    }
+    if (len > 1)
+        result = shift(result, len);
+    return result;
+}
+
+uint1024_t mod_op(uint1024_t x, uint1024_t y) {
+    if (compare_op(x, y) == -1)
+        return x;
+    uint1024_t current, other, zero = from_uint(0);
+    int len;
+    bool d;
+    current = getlastpart_op(x, y.last_pos);
+    other = getfirstpart_op(x, (x.last_pos - y.last_pos));
+    len = x.last_pos - y.last_pos;
+    if (compare_op(current, y) == -1) {
+        current = getlastpart_op(x, y.last_pos + 1);
+        other = getfirstpart_op(x, (x.last_pos - (y.last_pos + 1)));
+        len = x.last_pos - (y.last_pos + 1);
+    }
+    while (len >= 0) {
+        for (int i = current.last_pos - 1; i > 0; i--) {
+            if (current.num[i] == 0)
+                current.last_pos--;
+            else
+                break;
+        }
+        if (compare_op(current, y) != -1)
+            current = small_mod_op(current, y);
+        current = merge(current, getlastpart_op(other, 1));
+        d = true;
+        for (int i = other.last_pos - 1; i >= 0; i--) {
+            if (other.num[i] != 0) {
+                d = false;
+                break;
+            }
+        }
+        if ((compare_op(current, zero) == 0) && d) 
+            break;
+        other = getfirstpart_op(other, (other.last_pos - 1));
+        len--;
+    }
+    current = shift(current, -1);
+    return current;
+}
+
+void printf_value(uint1024_t x) {
+    uint8_t output[309];
+    int pos = 0;
+    uint1024_t zero = from_uint(0), ten = from_uint(10);
+    while (compare_op(x, zero) == 1) {
+        output[pos] = mod_op(x, ten).num[0];
+        x = del_op(x, ten);
+        pos++;
+    }
+    for (int i = (pos - 1); i >= 0; i--)
+        printf("%d", output[i]);
+    printf("\n");
 }
 
 int main() {
-    struct uint1024_t t1, t;
-    // scanf_value(&t);
-    t1 = from_uint(9999);
-    t = from_uint(1);
-    t = add_op(t1, t);
-    printf_value(t);
-    // char s[309];
-    // itoa(2131241241234234243534, s, 10);
-    // printf("%s", s);
     return 0;
 }
