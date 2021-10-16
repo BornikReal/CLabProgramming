@@ -1,31 +1,19 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
 
-const int Size = 129;
+const int Size = 128;
 
 typedef struct uint1024_t
 {
-    uint8_t num[129]; 
+    uint8_t num[128]; 
     uint8_t last_pos;
 } uint1024_t;
 
-uint1024_t zero, ten, one;
-
 void printfold(uint1024_t x) {
-    // for (int i = 128; i >= 0; i--)
-    //     printf("%d ", x.num[i]);
     for (int i = (x.last_pos - 1); i >= 0; i--)
         printf("%d ", x.num[i]);
     printf("\n");
-}
-
-bool iszero(uint1024_t x) {
-    for (int i = 128; i >= 0; i--)
-        if (x.num[i] != 0)
-            return false;
-    return true;
 }
 
 uint8_t pos(uint8_t x, uint8_t y) {
@@ -194,6 +182,7 @@ int compare_op(uint1024_t x, uint1024_t y) {
 }
 
 uint1024_t del_op(uint1024_t x, uint1024_t y) {
+    uint1024_t zero = from_uint(0);
     uint1024_t res = zero, curValue = zero, cur;
     res.last_pos = x.last_pos;
     bool zerocheck = true;
@@ -226,7 +215,7 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
 }
 
 uint1024_t mod_op(uint1024_t x, uint1024_t y) {
-    uint1024_t curValue = zero, cur;
+    uint1024_t curValue = from_uint(0), cur;
     for (int i = x.last_pos - 1; i >= 0; i--)
     {
         curValue = shift(curValue, 1);
@@ -250,6 +239,7 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
 }
 
 void longshort10(uint1024_t x, uint1024_t *delg, int *modg) {
+    uint1024_t zero = from_uint(0);
     if ((x.last_pos == 1) && (x.num[0] < 10)) {
         *delg = zero;
         *modg = x.num[0];
@@ -273,10 +263,9 @@ void longshort10(uint1024_t x, uint1024_t *delg, int *modg) {
 }
 
 void printf_value(uint1024_t x) {
+    uint1024_t del, zero = from_uint(0);
     uint8_t output[309];
-    int pos = 0;
-    uint1024_t del;
-    int mod;
+    int pos = 0, mod;
     while (compare_op(x, zero) == 1) {
         longshort10(x, &del, &mod);
         output[pos] = mod;
@@ -288,56 +277,4 @@ void printf_value(uint1024_t x) {
     for (int i = (pos - 1); i >= 0; i--)
         printf("%d", output[i]);
     printf("\n");
-}
-
-int main() {
-    zero = from_uint(0);
-    ten = from_uint(10);
-    one = from_uint(1);
-
-    // printf_value(zero);
-    // printf();
-    // uint1024_t a = from_uint(43124237), b = from_uint(10), r;
-    // // printfold(a);
-    // // printfold(b);
-    // r = del_op(a, b);
-    // printfold(r);
-    // r = mod_op(a, b);
-    // printfold(r);
-
-    // printfold(shift(from_uint(900), -1));
-    // printf_value(from_uint(100000007));
-
-    // uint1024_t a = from_uint(20), b = from_uint(10), r;
-    // // printfold(a);
-    // // printfold(b);
-    // // printf("------------------------------\n");
-    // r = mod_op(a, b);
-    // printfold(r);
-    // printf_value(r);
-    // // r = mod_op(a, b);
-    // // // printf("------------------------------\n");
-    // // printfold(r);
-
-    // uint1024_t a = from_uint(1), b = from_uint(2);
-    // for (int i = 1; i <= 1023; i++)
-    //     a = mult_op(a, b);
-    // // printfold(a);
-    // printf_value(a);
-    
-    // uint1024_t a = from_uint(1), b = from_uint(2), c = from_uint(10);
-    // for (int i = 1; i <= 1023; i++)
-    //     a = mult_op(a, b);
-    // a = del_op(a, c);
-    // // printfold(a);
-    // a = mod_op(a, c);
-    // printfold(a);
-    // // printf_value(a);
-
-    // uint1024_t a = from_uint(716), b = from_uint(10), r;
-    // for (int i = 1; i <= 100; i++)
-    //     printfold(small_mod_op(a, b));
-    // r = small_mod_op(a, b);
-    // printfold(r);
-    return 0;
 }
