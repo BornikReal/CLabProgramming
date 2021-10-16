@@ -3,7 +3,8 @@
 #include <stdbool.h>
 #include <uint1024_t.h>
 
-int main() {
+int main()
+{
     uint1024_t x = from_uint(3156), y = from_uint(154);
     printf_value(add_op(x, y));
     printf_value(subtr_op(x, y));
