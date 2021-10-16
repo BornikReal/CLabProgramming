@@ -196,12 +196,12 @@ int compare_op(uint1024_t x, uint1024_t y) {
 uint1024_t del_op(uint1024_t x, uint1024_t y) {
     uint1024_t res = zero, curValue = zero, cur;
     res.last_pos = x.last_pos;
+    bool zerocheck = true;
     for (int i = x.last_pos - 1; i >= 0; i--)
     {
         curValue = shift(curValue, 1);
         curValue.num[0] = x.num[i];
-        int x = 0;
-        int l = 0, r = 256;
+        int x = 0, l = 0, r = 256;
         while (l <= r)
         {
             int m = (l + r) / 2;
@@ -214,14 +214,13 @@ uint1024_t del_op(uint1024_t x, uint1024_t y) {
             else
                 r = m - 1;
         }
-        res.num[i] = x;
-        curValue = subtr_op(curValue, mult_op(y, from_uint(x)));
-    }
-    for (int i = (res.last_pos - 1); i >= 0; i--) {
-        if (res.num[i] == 0)
+        if ((x == 0) && zerocheck)
             res.last_pos--;
-        else
-            break;
+        else {
+            res.num[i] = x;
+            zerocheck = false;
+        }
+        curValue = subtr_op(curValue, mult_op(y, from_uint(x)));
     }
     return res;
 }
@@ -232,11 +231,10 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
     {
         curValue = shift(curValue, 1);
         curValue.num[0] = x.num[i];
-        int x = 0;
-        int l = 0, r = 256;
+        int x = 0, l = 0, r = 256;
         while (l <= r)
         {
-            int m = (l + r) >> 1;
+            int m = (l + r) / 2;
             cur = mult_op(y, from_uint(m));
             if (compare_op(cur, curValue) != 1)
             {
@@ -251,50 +249,42 @@ uint1024_t mod_op(uint1024_t x, uint1024_t y) {
     return curValue;
 }
 
-void comb_op(uint1024_t x, uint1024_t y, uint1024_t *delg, uint1024_t *modg) {
-    uint1024_t curValue = zero, cur;
+void longshort10(uint1024_t x, uint1024_t *delg, int *modg) {
+    if ((x.last_pos == 1) && (x.num[0] < 10)) {
+        *delg = zero;
+        *modg = x.num[0];
+    }
     *delg = zero;
     delg -> last_pos = x.last_pos;
-    for (int i = x.last_pos - 1; i >= 0; i--)
+    int ost = 0, cur;
+    bool zerocheck = true;
+    for (int i = (delg -> last_pos - 1); i >= 0; i--)
     {
-        curValue = shift(curValue, 1);
-        curValue.num[0] = x.num[i];
-        int x = 0;
-        int l = 0, r = 256;
-        while (l <= r)
-        {
-            int m = (l + r) >> 1;
-            cur = mult_op(y, from_uint(m));
-            if (compare_op(cur, curValue) != 1)
-            {
-                x = m;
-                l = m + 1;
-            }
-            else
-                r = m - 1;
-        }
-        delg -> num[i] = x;
-        curValue = subtr_op(curValue, mult_op(y, from_uint(x)));
-    }
-    for (int i = (delg -> last_pos - 1); i >= 0; i--) {
-        if (delg -> num[i] == 0)
+        cur = ost * 256 + x.num[i];
+        if ((cur < 10) && zerocheck)
             delg -> last_pos--;
-        else
-            break;
+        else {
+            delg -> num[i] = cur / 10;
+            zerocheck = false;
+        }
+        ost = cur % 10;
     }
-    *modg = curValue;
+    *modg = ost;
 }
 
 void printf_value(uint1024_t x) {
     uint8_t output[309];
     int pos = 0;
-    uint1024_t del, mod;
+    uint1024_t del;
+    int mod;
     while (compare_op(x, zero) == 1) {
-        comb_op(x, ten, &del, &mod);
-        output[pos] = mod.num[0];
+        longshort10(x, &del, &mod);
+        output[pos] = mod;
         x = del;
         pos++;
     }
+    if (pos == 0)
+        printf("0");
     for (int i = (pos - 1); i >= 0; i--)
         printf("%d", output[i]);
     printf("\n");
@@ -305,6 +295,7 @@ int main() {
     ten = from_uint(10);
     one = from_uint(1);
 
+    // printf_value(zero);
     // printf();
     // uint1024_t a = from_uint(43124237), b = from_uint(10), r;
     // // printfold(a);
@@ -317,22 +308,22 @@ int main() {
     // printfold(shift(from_uint(900), -1));
     // printf_value(from_uint(100000007));
 
-    // uint1024_t a = from_uint(300), b = from_uint(10), r;
-    // printfold(a);
-    // printfold(b);
-    // printf("------------------------------\n");
-    // r = del_op(a, b);
-    // // printfold(r);
+    // uint1024_t a = from_uint(20), b = from_uint(10), r;
+    // // printfold(a);
+    // // printfold(b);
+    // // printf("------------------------------\n");
+    // r = mod_op(a, b);
+    // printfold(r);
     // printf_value(r);
     // // r = mod_op(a, b);
     // // // printf("------------------------------\n");
     // // printfold(r);
 
-    uint1024_t a = from_uint(1), b = from_uint(2);
-    for (int i = 1; i <= 1023; i++)
-        a = mult_op(a, b);
-    printfold(a);
-    printf_value(a);
+    // uint1024_t a = from_uint(1), b = from_uint(2);
+    // for (int i = 1; i <= 1023; i++)
+    //     a = mult_op(a, b);
+    // // printfold(a);
+    // printf_value(a);
     
     // uint1024_t a = from_uint(1), b = from_uint(2), c = from_uint(10);
     // for (int i = 1; i <= 1023; i++)
