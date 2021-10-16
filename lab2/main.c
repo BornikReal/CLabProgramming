@@ -14,5 +14,7 @@ int main() {
     for (int i = 1; i <= 1023; i++)
         a = mult_op(a, b);
     printf_value(a);
+    scanf_value(&a);
+    printf_value(a);
     return 0;
 }
