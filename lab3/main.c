@@ -17,57 +17,48 @@ int monthtonum(char cur[]) {
 }
 
 long long int datetosec(char date[]) {
-    struct tm* ptr;
-    time_t t;
     char cur[6];
-    t = time(NULL);
-    // ptr = localtime(&t);
+    int sec = 0;
 
     copy(cur, date, 2);
-    ptr -> tm_mday = atoi(cur);
-    // printf("%s\n", cur);
+    sec += (atoi(cur, cur + 2, 10) - 1) * 86400;
 
     copy(cur, date + 3, 3);
-    ptr -> tm_mon = monthtonum(cur);
-    // printf("%s\n", cur);
-    // printf("%d\n", monthtonum(cur));
+    for (int i = 0; i < monthtonum(cur); i++)
+        sec += daysinmonth[i] * 86400;
 
     copy(cur, date + 7, 4);
-    ptr -> tm_year = atoi(cur) - 1900;
-    // printf("%s\n", cur);
+    for (int i = 1970; i < atoi(cur, cur + 4, 10); i++) {
+        if ((i % 4 == 0) && (i % 100 != 0) || (i % 400 == 0))
+            sec += 31622400;
+        else
+            sec += 31536000;
+    }
     
     copy(cur, date + 12, 2);
-    ptr -> tm_hour = atoi(cur);
-    // printf("%s\n", cur);
+    sec += atoi(cur, cur + 2, 10) * 3600;
 
     copy(cur, date + 15, 2);
-    ptr -> tm_min = atoi(cur);
-    // printf("%s\n", cur);
+    sec += atoi(cur, cur + 2, 10) * 60;
 
     copy(cur, date + 18, 2);
-    ptr -> tm_sec = atoi(cur);
-    // ptr -> tm_isdst = 121;
-    // printf("%s\n", cur);
+    sec += atoi(cur, cur + 2, 10);
+
     
     copy(cur, date + 21, 1);
-    // printf("%s\n", cur);
-    int typ, tmz = 0;
+    
+    int typ;
     if (strcmp(cur, "-") == 0)
         typ = -1;
     else
-        typ == 1;
+        typ = 1;
 
     copy(cur, date + 22, 2);
-    // printf("%s\n", cur);
+    sec += typ * (atoi(cur, cur + 2, 10) * 3600);
 
     copy(cur, date + 24, 2);
-    // printf("%s\n", cur);
-
-    char str[100];
-    strftime(str, 100, "%d/%b/%Y:%H:%M:%S", ptr);
-    printf("%s\n", str);
-
-    // printf("%s", asctime(ptr));
+    sec += typ * (atoi(cur, cur + 2, 10) * 60);
+    printf("%d\n", sec);
     return 0;
 }
 
@@ -86,7 +77,7 @@ int main() {
     // char *s, *s1;
     // scanf("%s%s", s, s1);
     // printf("12345678" + 4);
-    datetosec("03/Jul/1995:10:50:02 -0400");
+    datetosec("02/Jan/1970:00:00:00 -0400");
     // struct tm timestr;
     // // time(&timestr);
     // timestr.tm_year = 2012;
