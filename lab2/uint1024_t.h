@@ -24,16 +24,14 @@ uint8_t pos(uint8_t x, uint8_t y)
         if ((x + 1) >= Size)
             return Size;
         else
-            ;
-        return (x + 1);
+            return (x + 1);
     }
     else
     {
         if ((y + 1) >= Size)
             return Size;
         else
-            ;
-        return (y + 1);
+            return (y + 1);
     }
 }
 

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include <uint1024_t.h>
 
 int main()
 {
+    int t = time(NULL);
     uint1024_t x = from_uint(3156), y = from_uint(154);
     printf_value(add_op(x, y));
     printf_value(subtr_op(x, y));
@@ -15,6 +17,7 @@ int main()
     for (int i = 1; i <= 1023; i++)
         a = mult_op(a, b);
     printf_value(a);
+    printf("%d сек.\n", time(NULL) - t);
     scanf_value(&a);
     printf_value(a);
     return 0;
