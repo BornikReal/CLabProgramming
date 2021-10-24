@@ -4,6 +4,7 @@
 
 const char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 const int daysinmonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+int delay[2000000];
 
 void copy(char first[], char second[], int count) {
     strncpy(first, "\0\0\0\0\0\0", 6);
@@ -58,36 +59,79 @@ int datetosec(char date[]) {
 
     copy(cur, date + 24, 2);
     sec += typ * (atoi(cur, cur + 2, 10) * 60);
-    printf("%d\n", sec);
-    return 0;
+    return sec;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     FILE *logFile;
     logFile = fopen("access_log_Jul95.log", "r");
-    char curstr[500], date[27], status[4];
-    int search, pos, amountspaces, amount500 = 0;
+    char curstr[250], date[27], status[4];
+    int search, pos, amountspaces, amount500 = 0, glob_pos = -1, prev = 0, cur, gap = 10, first = 0, time = 0, max = 0, count = 0;
+    if (argc == 1) {
+        printf("Enter the gap: ");
+        scanf("%d", &gap);
+    }
+    else if (argc == 2) {
+        if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+            printf("Usage: main.exe [gap]\n");
+            return 0;
+        }
+        else if(strspn(argv[1], "0123456789") != strlen(argv[1])) {
+            printf("Gap can be only usigned integer!\n");
+            return 1;
+        }
+        else
+            gap = atoi(argv[1]);
+    }
+    else {
+        printf("To many arguments. Right usage: main.exe [gap]\n");
+        return 1;
+    }
     while (!feof(logFile)) {
-        fgets(curstr, 500, logFile);
+        fgets(curstr, 250, logFile);
         search = -1;
-        for (int i = 0; curstr[i] != ']'; i++) {
+        for (int i = 0; ((curstr[i] != ']') && (i < strlen(curstr))); i++) {
             if (curstr[i] == '[')
                 search = i + 1;
             if (search != -1)
                 date[i - search] = curstr[i];
+        }
+        cur = datetosec(date);
+        if (glob_pos != -1) {
+            delay[glob_pos] = cur - prev;
         }
         amountspaces = 0;
         for (int i = strlen(curstr) - 1; i >= 0; i--) {
             if (curstr[i] == ' ')
                 amountspaces++;
             if (amountspaces == 2) {
-                if (curstr[i + 1] == '5')
+                if (curstr[i + 1] == '5') {
                     amount500++;
+                    printf("%s", curstr);
+                }
                 break;
             }
         }
+        prev = cur;
+        if (glob_pos != -1) {
+            time += delay[glob_pos];
+            count++;
+            if (time > gap) {
+                if (count > max)
+                    max = count;
+                for (int j = first; j <= glob_pos; j++) {
+                    time -= delay[j];
+                    first++;
+                    count--;
+                    if (time <= gap)
+                        break;
+                }
+            }
+        }
+        glob_pos++;
     }
-    printf("%d\n", amount500);
+    printf("Number of requests with 5xx status %d\n", amount500);
+    printf("Maximal number of requests in gap of %d sec. is %d\n", gap, count);
     fclose(logFile);
     return 0;
 }
