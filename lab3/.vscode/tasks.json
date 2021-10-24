@@ -5,6 +5,7 @@
             "label": "C/C++: gcc.exe сборка активного файла",
             "command": "C:\\msys64\\mingw64\\bin\\gcc.exe",
             "args": [
+                "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
                 "-o",
