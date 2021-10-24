@@ -16,7 +16,7 @@ int monthtonum(char cur[]) {
             return i;
 }
 
-long long int datetosec(char date[]) {
+int datetosec(char date[]) {
     char cur[6];
     int sec = 0;
 
@@ -63,48 +63,31 @@ long long int datetosec(char date[]) {
 }
 
 int main() {
-    // struct tm* ptr;
-    // time_t t;
-    // t = time(NULL);
-    // ptr = localtime(&t);
-    // printf("%s", asctime(ptr));
-    // // ptr = gmtime(&t);
-    // // ptr -> tm_year = 2010;
-    // // ptr -> tm_yday = 2000;
-    // ptr -> tm_year = 100;
-    // printf("%s", asctime(ptr));
-
-    // char *s, *s1;
-    // scanf("%s%s", s, s1);
-    // printf("12345678" + 4);
-    datetosec("02/Jan/1970:00:00:00 -0400");
-    // struct tm timestr;
-    // // time(&timestr);
-    // timestr.tm_year = 2012;
-    // timestr.tm_mon = 11;
-    // timestr.tm_mday = 4;
-    // timestr.tm_hour = 1;
-    // timestr.tm_min = 30;
-    // timestr.tm_sec = 0;
-    // timestr.tm_isdst = 0;
-    // // time_t t = localtime(&timestr);
-    // // printf("%lli\n", t);
-    // printf("%s\n", asctime(&timestr));
-    // // str = asctime(&t);
-    // // strftime(str, sizeof(str), "%A %c", localtime(&t));
-    // printf("%s\n", asctime(t));
-    // char cur[] = "sasdsa";
-    // strcat(cur, "1231");
-    // printf("%s\n", cur);
-
-    // FILE *logFile;
-    // logFile = fopen("access_log_Jul95.log", "r");
-    // char *curstr;
-    // while (!feof(logFile)) {
-    //     fgets(curstr, 500, logFile);
-    // //     printf("%d||||||", strcspn(curstr, "["));
-    // //     printf("%s", curstr);
-    // }
-    // fclose(logFile);
+    FILE *logFile;
+    logFile = fopen("access_log_Jul95.log", "r");
+    char curstr[500], date[27], status[4];
+    int search, pos, amountspaces, amount500 = 0;
+    while (!feof(logFile)) {
+        fgets(curstr, 500, logFile);
+        search = -1;
+        for (int i = 0; curstr[i] != ']'; i++) {
+            if (curstr[i] == '[')
+                search = i + 1;
+            if (search != -1)
+                date[i - search] = curstr[i];
+        }
+        amountspaces = 0;
+        for (int i = strlen(curstr) - 1; i >= 0; i--) {
+            if (curstr[i] == ' ')
+                amountspaces++;
+            if (amountspaces == 2) {
+                if (curstr[i + 1] == '5')
+                    amount500++;
+                break;
+            }
+        }
+    }
+    printf("%d\n", amount500);
+    fclose(logFile);
     return 0;
 }
