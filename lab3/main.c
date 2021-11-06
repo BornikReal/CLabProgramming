@@ -65,7 +65,7 @@ int datetosec(char date[]) {
 int main(int argc, char *argv[]) {
     FILE *logFile;
     logFile = fopen("access_log_Jul95.log", "r");
-    char curstr[250], date[27], status[4];
+    char curstr[250], date[27], status[4], errorstr[40000];
     int search, pos, amountspaces, amount500 = 0, glob_pos = -1, prev = 0, cur, gap = 10, first = 0, time = 0, max = 0, count = 0;
     if (argc == 1) {
         printf("Enter the gap: ");
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
             if (amountspaces == 2) {
                 if (curstr[i + 1] == '5') {
                     amount500++;
-                    printf("%s", curstr);
+                    strcat(errorstr, curstr);
                 }
                 break;
             }
@@ -130,8 +130,9 @@ int main(int argc, char *argv[]) {
         }
         glob_pos++;
     }
+    printf("%s", errorstr);
     printf("Number of requests with 5xx status %d\n", amount500);
-    printf("Maximal number of requests in gap of %d sec. is %d\n", gap, count);
+    printf("Maximal number of requests in gap of %d sec. is %d\n", gap, max);
     fclose(logFile);
     return 0;
 }
