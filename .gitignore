@@ -1,0 +1,7 @@
+/lab1/.vscode/*
+/lab2/.vscode/*
+/lab3/.vscode/*
+*.exe
+*.txt
+tempCodeRunnerFile.c
+*.log
