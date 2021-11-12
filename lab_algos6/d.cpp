@@ -52,5 +52,42 @@ int main() {
     }
     for (int i = 0; i < 26; i++)
         registers[i] = 0;
+    for (int i = 0; i < buf_com.size(); i++) {
+        if (buf_com[i][0] == '+') {
+            buf = qe.pop_back();
+            buf += qe.pop_back();
+            qe.push_back((buf + 65536) % 65536);
+        }
+        else if (buf_com[i][0] == '-') {
+            buf = qe.pop_back();
+            buf -= qe.pop_back();
+            qe.push_back((buf + 65536) % 65536);
+        }
+        else if (buf_com[i][0] == '*') {
+            buf = qe.pop_back();
+            buf *= qe.pop_back();
+            qe.push_back((buf + 65536) % 65536);
+        }
+        else if (buf_com[i][0] == '/') {
+            buf = qe.pop_back();
+            temp = qe.pop_back();
+            if (temp == 0)
+                buf = 0;
+            else
+                buf /= temp;
+            qe.push_back((buf + 65536) % 65536);
+        }
+        else if (buf_com[i][0] == '%') {
+            buf = qe.pop_back();
+            temp = qe.pop_back();
+            if (temp == 0)
+                buf = 0;
+            else
+                buf %= temp;
+            qe.push_back((buf + 65536) % 65536);
+        }
+        else
+            qe.push_back(atoi(buf_com[i].c_str()));
+    }
     return 0;
 }
