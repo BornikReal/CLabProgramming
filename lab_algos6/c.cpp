@@ -15,6 +15,36 @@ private:
     };
     leaf *root = nullptr;
     int size = 0;
+    leaf *find(int x, leaf *cur)
+    {
+        if (cur == nullptr)
+            return nullptr;
+        if (x > cur->key)
+        {
+            if (cur->right == nullptr)
+                return cur;
+            return find(x, cur->right);
+        }
+        else if (x < cur->key)
+        {
+            if (cur->left == nullptr)
+                return cur;
+            return find(x, cur->left);
+        }
+        else
+            return cur;
+    }
+public:
+    bool exists(int x)
+    {
+        leaf *cur = find(x, root);
+        if (cur == nullptr)
+            return false;
+        else if (cur->key != x)
+            return false;
+        else
+            return true;
+    }
 };
 
 int main()
