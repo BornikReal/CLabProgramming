@@ -2,3 +2,5 @@
 /lab2/.vscode/*
 *.exe
 *.txt
+*.in
+*.out
