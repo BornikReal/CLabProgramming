@@ -3,6 +3,20 @@
 #include <string>
 using namespace std;
 
+class node
+{
+private:
+    struct leaf
+    {
+        int key;
+        leaf *parent;
+        leaf *left;
+        leaf *right;
+    };
+    leaf *root = nullptr;
+    int size = 0;
+};
+
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -13,6 +27,7 @@ int main()
     long long int first;
     bool ans;
     pair<bool, int> output;
+    node bst;
     while (cin >> input)
     {
         if (input == "insert")
