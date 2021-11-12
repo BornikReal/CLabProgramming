@@ -64,6 +64,59 @@ private:
             return prev(x, cur->right, cur);
         }
     }
+    int delete_simple(leaf *cur)
+    {
+        if ((cur->left == nullptr) && (cur->right == nullptr))
+        {
+            if ((size == 1) || (cur == root))
+                root = nullptr;
+            if (cur->parent != nullptr)
+            {
+                if (cur->parent->left == cur)
+                    cur->parent->left = nullptr;
+                else
+                    cur->parent->right = nullptr;
+            }
+            int deleted = cur->key;
+            delete (cur);
+            return deleted;
+        }
+        if (cur->left != nullptr)
+        {
+            if (root == cur)
+            {
+                root = cur->left;
+                cur->left->parent = nullptr;
+            }
+            else
+            {
+                cur->left->parent = cur->parent;
+                if (cur->parent->left == cur)
+                    cur->parent->left = cur->left;
+                else
+                    cur->parent->right = cur->left;
+            }
+        }
+        else
+        {
+            if (root == cur)
+            {
+                root = cur->right;
+                cur->right->parent = nullptr;
+            }
+            else
+            {
+                cur->right->parent = cur->parent;
+                if (cur->parent->left == cur)
+                    cur->parent->left = cur->right;
+                else
+                    cur->parent->right = cur->right;
+            }
+        }
+        int deleted = cur->key;
+        delete (cur);
+        return deleted;
+    }
 public:
     void insert(int x)
     {
@@ -129,6 +182,22 @@ public:
         else
             return make_pair(true, cur->key);
     }
+    void delete_leaf(int x)
+    {
+        if (exists(x))
+        {
+            leaf *cur = find(x, root);
+            if ((cur->left == nullptr) || (cur->right == nullptr))
+                delete_simple(cur);
+            else
+            {
+                leaf *next_el = next(cur->key, root, nullptr);
+                cur->key = next_el->key;
+                delete_simple(next_el);
+            }
+            size--;
+        }
+    }
 };
 
 int main()
@@ -147,18 +216,18 @@ int main()
         if (input == "insert")
         {
             cin >> first;
-            // bst.insert(first);
+            bst.insert(first);
         }
 
         else if (input == "delete")
         {
             cin >> first;
-            // bst.delete_leaf(first);
+            bst.delete_leaf(first);
         }
         else if (input == "exists")
         {
             cin >> first;
-            // ans = bst.exists(first);
+            ans = bst.exists(first);
             if (ans)
                 cout << "true" << endl;
             else
@@ -167,7 +236,7 @@ int main()
         else if (input == "next")
         {
             cin >> first;
-            // output = bst.next(first);
+            output = bst.next(first);
             if (output.first)
                 cout << output.second << endl;
             else
@@ -176,7 +245,7 @@ int main()
         else if (input == "prev")
         {
             cin >> first;
-            // output = bst.prev(first);
+            output = bst.prev(first);
             if (output.first)
                 cout << output.second << endl;
             else
