@@ -2,6 +2,22 @@
 #include <vector>
 using namespace std;
 
+int previ = INT_MIN;
+bool isright = true;
+
+bool check_array(vector<vector<int> > &array, int cur = 0) {
+    if (array[cur][1] != 0)
+        check_array(array, array[cur][1] - 1);
+    if (array[cur][0] <= previ)
+        isright = false;
+    previ = array[cur][0];
+    if (!isright)
+        return false;
+    if (array[cur][2] != 0)
+        check_array(array, array[cur][2] - 1);
+    return isright;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -16,5 +32,13 @@ int main() {
         array[i].push_back(l);
         array[i].push_back(r);
     }
+    if (array.size() == 0) {
+        cout << "YES" << endl;
+        return 0;
+    }
+    if (check_array(array))
+        cout << "YES" << endl;
+    else
+        cout << "NO" << endl;
     return 0;
 }
