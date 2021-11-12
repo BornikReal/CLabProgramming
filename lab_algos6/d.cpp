@@ -98,6 +98,52 @@ int main() {
             cout << char(qe.pop_back());
         else if (buf_com[i][0] == 'C')
             cout << char(registers[buf_com[i][1] - 'a']);
+        else if (buf_com[i][0] == ':')
+            continue;
+        else if (buf_com[i][0] == 'J') {
+            input = buf_com[i].substr(1, buf_com.size() - 1);
+            for (int j = 0; j < assoc.size(); j++) {
+                if (assoc[j].first == input) {
+                    i = assoc[j].second;
+                    break;
+                }
+            }
+        }
+        else if (buf_com[i][0] == 'Z') {
+            if (registers[buf_com[i][1] - 'a'] == 0) {
+                input = buf_com[i].substr(2, buf_com.size() - 2);
+                for (int j = 0; j < assoc.size(); j++) {
+                    if (assoc[j].first == input) {
+                        i = assoc[j].second;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (buf_com[i][0] == 'E') {
+            if (registers[buf_com[i][1] - 'a'] == registers[buf_com[i][2] - 'a']) {
+                input = buf_com[i].substr(3, buf_com.size() - 3);
+                for (int j = 0; j < assoc.size(); j++) {
+                    if (assoc[j].first == input) {
+                        i = assoc[j].second;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (buf_com[i][0] == 'G') {
+            if (registers[buf_com[i][1] - 'a'] > registers[buf_com[i][2] - 'a']) {
+                input = buf_com[i].substr(3, buf_com.size() - 3);
+                for (int j = 0; j < assoc.size(); j++) {
+                    if (assoc[j].first == input) {
+                        i = assoc[j].second;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (buf_com[i][0] == 'Q')
+            break;
         else
             qe.push_back(atoi(buf_com[i].c_str()));
     }
