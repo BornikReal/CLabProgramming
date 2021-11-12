@@ -86,6 +86,10 @@ int main() {
                 buf %= temp;
             qe.push_back((buf + 65536) % 65536);
         }
+        else if (buf_com[i][0] == '>')
+            registers[buf_com[i][1] - 'a'] = qe.pop_back();
+        else if (buf_com[i][0] == '<')
+            qe.push_back(registers[buf_com[i][1] - 'a']);
         else
             qe.push_back(atoi(buf_com[i].c_str()));
     }
