@@ -34,6 +34,36 @@ private:
         else
             return cur;
     }
+    leaf *next(int x, leaf *cur, leaf *minimum)
+    {
+        if (cur == nullptr)
+            return minimum;
+        if (cur->key <= x)
+        {
+            if (cur->right == nullptr)
+                return minimum;
+            return next(x, cur->right, minimum);
+        }
+        else
+        {
+            return next(x, cur->left, cur);
+        }
+    }
+    leaf *prev(int x, leaf *cur, leaf *maximum)
+    {
+        if (cur == nullptr)
+            return maximum;
+        if (cur->key >= x)
+        {
+            if (cur->left == nullptr)
+                return maximum;
+            return prev(x, cur->left, maximum);
+        }
+        else
+        {
+            return prev(x, cur->right, cur);
+        }
+    }
 public:
     void insert(int x)
     {
@@ -78,6 +108,26 @@ public:
             return false;
         else
             return true;
+    }
+    pair<bool, int> next(int x)
+    {
+        leaf *cur = next(x, root, nullptr);
+        if (cur == nullptr)
+            return make_pair(false, 0);
+        if (cur->key <= x)
+            return make_pair(false, 0);
+        else
+            return make_pair(true, cur->key);
+    }
+    pair<bool, int> prev(int x)
+    {
+        leaf *cur = prev(x, root, nullptr);
+        if (cur == nullptr)
+            return make_pair(false, 0);
+        if (cur->key >= x)
+            return make_pair(false, 0);
+        else
+            return make_pair(true, cur->key);
     }
 };
 
