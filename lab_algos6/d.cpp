@@ -90,6 +90,14 @@ int main() {
             registers[buf_com[i][1] - 'a'] = qe.pop_back();
         else if (buf_com[i][0] == '<')
             qe.push_back(registers[buf_com[i][1] - 'a']);
+        else if (buf_com[i] == "P")
+            cout << qe.pop_back() << endl;
+        else if (buf_com[i][0] == 'P')
+            cout << registers[buf_com[i][1] - 'a'] << endl;
+        else if (buf_com[i] == "C")
+            cout << char(qe.pop_back());
+        else if (buf_com[i][0] == 'C')
+            cout << char(registers[buf_com[i][1] - 'a']);
         else
             qe.push_back(atoi(buf_com[i].c_str()));
     }
