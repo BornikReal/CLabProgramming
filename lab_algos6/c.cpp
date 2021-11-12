@@ -35,6 +35,40 @@ private:
             return cur;
     }
 public:
+    void insert(int x)
+    {
+        if (!exists(x))
+        {
+            size++;
+            leaf *new_el = new leaf({x, nullptr, nullptr, nullptr});
+            if (root == nullptr)
+                root = new_el;
+            else
+            {
+                leaf *comp = root;
+                while (true)
+                {
+                    if (x > comp->key)
+                    {
+                        if (comp->right == nullptr)
+                            break;
+                        comp = comp->right;
+                    }
+                    else
+                    {
+                        if (comp->left == nullptr)
+                            break;
+                        comp = comp->left;
+                    }
+                }
+                new_el->parent = comp;
+                if (new_el->key > comp->key)
+                    comp->right = new_el;
+                else
+                    comp->left = new_el;
+            }
+        }
+    }
     bool exists(int x)
     {
         leaf *cur = find(x, root);
