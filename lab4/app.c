@@ -33,20 +33,25 @@ int main(int argc, char* argv[]) {
         addit /= 128;
     }
     printf("%d\n", size_of_tag);
-    frame new_fr;
-    for (int i = 0; i < 4; i++)
-        new_fr.frame_id[i] = fgetc(musicf);
-    addit = 128 * 128 * 128;
-    new_fr.frame_size = 0;
-    for (int i = 0; i < 4; i++) {
-        new_fr.frame_size += addit * fgetc(musicf);
-        addit /= 128;
+    while (ftell(musicf) < (size_of_tag + 10)) {
+        frame new_fr;
+        for (int i = 0; i < 4; i++)
+            new_fr.frame_id[i] = fgetc(musicf);
+        if (((new_fr.frame_id[3] < 'A') || (new_fr.frame_id[3] > 'Z')) && ((new_fr.frame_id[3] < '0') || (new_fr.frame_id[3] > '9')))
+            continue;
+        addit = 128 * 128 * 128;
+        new_fr.frame_size = 0;
+        for (int i = 0; i < 4; i++) {
+            new_fr.frame_size += addit * fgetc(musicf);
+            addit /= 128;
+        }
+        fseek(musicf, 2, SEEK_CUR);
+        new_fr.frame_cont = malloc(new_fr.frame_size);
+        for (int i = 0; i < new_fr.frame_size; i++)
+            new_fr.frame_cont[i] = fgetc(musicf);
+        new_fr.pos = ftell(musicf);
+        printf("%d %d %s\n", new_fr.frame_size, new_fr.pos, new_fr.frame_id);
+        print_str(new_fr.frame_cont, new_fr.frame_size);
     }
-    fseek(musicf, 2, SEEK_CUR);
-    new_fr.frame_cont = malloc(new_fr.frame_size);
-    for (int i = 0; i < new_fr.frame_size; i++)
-        new_fr.frame_cont[i] = fgetc(musicf);
-    printf("%d %s\n", new_fr.frame_size, new_fr.frame_id);
-    print_str(new_fr.frame_cont, new_fr.frame_size);
     return 0;
 }
