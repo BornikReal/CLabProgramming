@@ -3,11 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <locale.h>
-#include <unistd.h>
+// #include <unistd.h>
 
 typedef struct {
     char frame_id[5];
-    char frame_flag[2];
+    int frame_flag[2];
     int frame_size;
     char *frame_cont;
     int pos;
@@ -22,13 +22,17 @@ void print_str(char *str_to_print, int size) {
 }
 
 void show_frame(frame* cur_frame) {
-    printf("Frame ID: %s\nFrame content: ", cur_frame -> frame_id);
+    printf("Frame ID: %s\nFrame size: %d\n", cur_frame -> frame_id, cur_frame->frame_size);
+    printf("Frame content: ");
     print_str(cur_frame -> frame_cont, cur_frame -> frame_size);
 }
 
 void show_all_frames() {
-    for (int i = 0; i < num; i++)
+    printf("---------------------------\n");
+    for (int i = 0; i < num; i++) {
         show_frame(&list_of_frames[i]);
+        printf("---------------------------\n");
+    }
 }
 
 int find_frame(char* frame_id) {
@@ -40,62 +44,86 @@ int find_frame(char* frame_id) {
 
 void change_frame(char* frame_id, char* frame_new_cont) {
     int fpos = find_frame(frame_id);
-    int dif = strlen(frame_new_cont) - list_of_frames[fpos].frame_size;
-    list_of_frames[fpos].frame_size = strlen(frame_new_cont);
-    strcpy(list_of_frames[fpos].frame_cont, frame_new_cont);
-    for (int i = (fpos + 1); i < num; i++)
-        list_of_frames[num].pos += dif;
+    if (fpos != -1) {
+        int dif = strlen(frame_new_cont) - list_of_frames[fpos].frame_size + 1;
+        list_of_frames[fpos].frame_size = strlen(frame_new_cont) + 1;
+        strcpy(list_of_frames[fpos].frame_cont, frame_new_cont);
+        for (int i = (fpos + 1); i < num; i++)
+            list_of_frames[i].pos += dif;
+    }
 }
 
 int main(int argc, char* argv[]) {
-    // printf("%s\n", getenv("TEMP"));
+    setlocale(LC_ALL, "Russian");
     int mode;
-    char* input1, input2;
+    char* filepath;
+    char* input1;
+    char* input2;
     if (argc == 1) {
-        printf("Right usage: --show - отображение всей метаинформации в виде таблицы\n");
-        printf("--set=prop_name --value=prop_value - выставляет значение 
-                определенного поля метаинформации с именем prop_name в 
-                значение prop_value\n");
-        printf("--get=prop_name - вывести определенное поле 
-                метаинформации с именем prop_name\n");
+        printf("Right usage: --show - show all frames\n");
+        printf("--set=prop_name --value=prop_value - set new value of some frame\n");
+        printf("--get=prop_name - show exactly frame\n");
         return 1;
     }
-    if (argc >= 4) {
+    if (argc > 4) {
         printf("Too many arguents!");
         return 1;
     }
-    else if (argc == 2) {
-        if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-            printf("Right usage: --show - отображение всей метаинформации в виде таблицы\n");
-            printf("--set=prop_name --value=prop_value - выставляет значение 
-                    определенного поля метаинформации с именем prop_name в 
-                    значение prop_value\n");
-            printf("--get=prop_name - вывести определенное поле 
-                    метаинформации с именем prop_name\n");
+    if (strstr(argv[1], "--filepath=") && strcmp(argv[1], "--filepath=")) {
+        filepath = malloc(sizeof(char) * (strlen(argv[1]) - 10));
+        strcpy(filepath, argv[1] + 11);
+        mode = 0;
+    }
+    else {
+        printf("Argument \"--filepath\" not found");
+        return 1;
+    }
+    if (argc == 3) {
+        if (!strcmp(argv[2], "-h") || !strcmp(argv[2], "--help")) {
+            printf("Right usage: --show - show all frames\n");
+            printf("--set=prop_name --value=prop_value - set new value of some frame\n");
+            printf("--get=prop_name - show exactly frame\n");
             return 0;
         }
-        else if (!strcmp(argv[1], "--show"))
+        else if (!strcmp(argv[2], "--show"))
             mode = 0;
-        // else if (!strcmp(argv[1], "--show"))
-        //     mode = 0;
+        else if (strstr(argv[2], "--get=") && strcmp(argv[2], "--get=")) {
+            input1 = malloc(sizeof(char) * (strlen(argv[2]) - 5));
+            strcpy(input1, argv[2] + 6);
+            mode = 1;
+        }
+        else {
+            printf("Wrong argumnet. Use \"app.exe -h\" to get info about argumnets.");
+            return 1;
+        }
     }
-    // for (int i = 0; i < argc; i++) {
-
-    // }
-    // char rez;
-    // while ((rez = getopt_long(argc,argv,"showW;b:C:d:")) != -1) {
-    //     switch (rez){
-	// 	case 'a': printf("found argument \"a\".\n");break;
-	// 	case 'b': printf("found argument \"b = %s\".\n",optarg);break;
-	// 	case 'C': printf("found argument \"C = %s\".\n",optarg);break;
-	// 	case 'd': printf("found argument \"D = %s\".\n",optarg);break;
-	// 	case '?': printf("Error found !\n"); break;
-    //     }
-    // }
-    setlocale(LC_ALL, "Russian");
+    else if (argc == 4) {
+        if (strstr(argv[2], "--set=") && strcmp(argv[2], "--set=")) {
+            input1 = malloc(sizeof(char) * (strlen(argv[2]) - 5));
+            strcpy(input1, argv[2] + 6);
+            mode = 2;
+        }
+        else {
+            printf("Wrong argumnet. Use \"app.exe -h\" to get info about argumnets.");
+            return 1;
+        }
+        if (strstr(argv[3], "--value=") && strcmp(argv[3], "--value=")) {
+            input2 = malloc(sizeof(char) * (strlen(argv[3]) - 7));
+            strcpy(input2, argv[3] + 8);
+            mode = 2;
+        }
+        else {
+            printf("Wrong argumnet. Use \"app.exe -h\" to get info about argumnets.");
+            return 1;
+        }
+    }
+    // printf("%s\n", getenv("TEMP"));
     FILE* musicf;
-    // test = fopen("%TEMP%");
-    musicf = fopen("minecraft.mp3", "rb");
+    musicf = fopen(filepath, "rb");
+    if (!musicf) {
+        printf("File not found");
+        return 1;
+    }
     char buf_str[100];
     int size_of_tag = 0, addit = 128 * 128 * 128;
     for (int i = 0; i < 3; i++)
@@ -109,7 +137,6 @@ int main(int argc, char* argv[]) {
         size_of_tag += addit * fgetc(musicf);
         addit /= 128;
     }
-    printf("%d\n", size_of_tag);
     while (ftell(musicf) < (size_of_tag + 10)) {
         for (int i = 0; i < 4; i++)
             list_of_frames[num].frame_id[i] = fgetc(musicf);
@@ -122,21 +149,43 @@ int main(int argc, char* argv[]) {
             list_of_frames[num].frame_size += addit * fgetc(musicf);
             addit /= 128;
         }
+        list_of_frames[num].frame_flag[0] = fgetc(musicf);
+        list_of_frames[num].frame_flag[1] = fgetc(musicf);
         if (list_of_frames[num].frame_id[0] != 'T') {
             fseek(musicf, list_of_frames[num].frame_size, SEEK_CUR);
             continue;
         }
-        list_of_frames[num].frame_flag[0] = fgetc(musicf);
-        list_of_frames[num].frame_flag[1] = fgetc(musicf);
         list_of_frames[num].frame_cont = malloc(list_of_frames[num].frame_size);
         for (int i = 0; i < list_of_frames[num].frame_size; i++)
             list_of_frames[num].frame_cont[i] = fgetc(musicf);
         list_of_frames[num].pos = ftell(musicf);
-        // printf("%d %d %s\n", list_of_frames[num].frame_size, list_of_frames[num].pos, list_of_frames[num].frame_id);
-        // print_str(list_of_frames[num].frame_cont, list_of_frames[num].frame_size);
         num++;
     }
-    // change_frame("TPE1", "aboba");
-    // show_all_frames();
+    if (mode == 0)
+        show_all_frames();
+    else if (mode == 1) {
+        bool check = true;
+        for (int i = 0; i < num; i++) {
+            if (!strcmp(list_of_frames[i].frame_id, input1)) {
+                check = false;
+                show_frame(&list_of_frames[i]);
+                break;
+            }
+        }
+        if (check) {
+            printf("Frame not found");
+            return 1;
+        }
+    }
+    else if (mode == 2) {
+        if (find_frame(input1) == -1) {
+            printf("Frame not found");
+            return 1;
+        }
+        change_frame(input1, input2);
+        FILE* musico;
+        musico = fopen(filepath, "wb");
+        // show_frame(&list_of_frames[find_frame(input1)]);
+    }
     return 0;
 }
