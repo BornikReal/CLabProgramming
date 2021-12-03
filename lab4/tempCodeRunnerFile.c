@@ -1,5 +1,4 @@
- * fgetc(musicf);
-    size_of_tag += 128 * 128 * fgetc(musicf);
-    size_of_tag += 128 * fgetc(musicf);
-    size_of_tag += fgetc(musicf);
-    printf("%d\n", size_of_tag
+ame_id[0] != 'T') || ((list_of_frames[num].frame_id[0] != 'C'))) {
+        //     fseek(musicf, list_of_frames[num].frame_size, SEEK_CUR);
+        //     continue;
+        // }

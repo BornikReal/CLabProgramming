@@ -64,7 +64,7 @@ int datetosec(char date[]) {
 
 int main(int argc, char *argv[]) {
     FILE *logFile;
-    logFile = fopen("access_log_Jul95.log", "r");
+    logFile = fopen("access_log_Jul95", "r");
     char curstr[250], date[27], status[4], errorstr[40000];
     int search, pos, amountspaces, amount500 = 0, glob_pos = -1, prev = 0, cur, gap = 10, first = 0, time = 0, max = 0, count = 0;
     if (argc == 1) {

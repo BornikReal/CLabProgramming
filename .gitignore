@@ -1,5 +1,9 @@
 /lab1/.vscode/*
 /lab2/.vscode/*
+/lab3/.vscode/*
+/lab4/.vscode/*
+/lab5/.vscode/*
+/lab6/.vscode/*
 *.exe
 *.txt
 *.in
