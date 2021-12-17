@@ -16,8 +16,11 @@ void check_file(FILE* file, char* filename) {
     }
 }
 
-int main(int argc, char* argv[])
+// int main(int argc, char* argv[])
+int main()
 {
+    int argc = 7;
+    char* argv[] = {"expander.exe", "--file", "test.arc", "--create", "files/test1.bmp", "files/test2.bmp", "files/test2.bmp"};
     char *archive_name;
     char *dir = NULL;
     int mode = -1, file_list;
