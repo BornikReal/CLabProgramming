@@ -16,11 +16,8 @@ void check_file(FILE* file, char* filename) {
     }
 }
 
-// int main(int argc, char* argv[])
-int main()
+int main(int argc, char* argv[])
 {
-    int argc = 7;
-    char* argv[] = {"expander.exe", "--file", "test.arc", "--create", "files/test1.bmp", "files/test2.bmp", "files/test2.bmp"};
     char *archive_name;
     char *dir = NULL;
     int mode = -1, file_list;
@@ -116,11 +113,9 @@ int main()
                     break;
                 }
             }
-            if (name_start != 0) {
-                for (int j = name_start; j < strlen(argv[i]); j++)
-                    right_filename[j - name_start] = argv[i][j];
-                right_filename[strlen(argv[i]) - name_start] = '\0';
-            }
+            for (int j = name_start; j < strlen(argv[i]); j++)
+                right_filename[j - name_start] = argv[i][j];
+            right_filename[strlen(argv[i]) - name_start] = '\0';
             fprintf(archive, "%s|%d|", right_filename, ftell(cur_file));
             fclose(cur_file);
         }
