@@ -161,7 +161,7 @@ private:
     }
 
 public:
-    int num_of_members = 1;
+    int num_of_members = 0;
     MultiMap()
     {
         set_container.resize(size);
