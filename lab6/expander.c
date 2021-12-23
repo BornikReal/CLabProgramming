@@ -3,12 +3,23 @@
 #include <string.h>
 #include <dirent.h>
 
+/**
+ * @brief Вывод сообщения об ошибке
+ * 
+ */
 void error_exit()
 {
     printf("Неправильно введены аргументы. Используйте \"expander.exe -h\" для получения справки.");
     exit(1);
 }
 
+
+/**
+ * @brief Проверка коректности файла
+ * 
+ * @param file Указатель на файл
+ * @param filename Имя файла
+ */
 void check_file(FILE* file, char* filename) {
     if (!file) {
         printf("Файл \"%s\" не найден.", filename);
@@ -113,11 +124,9 @@ int main(int argc, char* argv[])
                     break;
                 }
             }
-            if (name_start != 0) {
-                for (int j = name_start; j < strlen(argv[i]); j++)
-                    right_filename[j - name_start] = argv[i][j];
-                right_filename[strlen(argv[i]) - name_start] = '\0';
-            }
+            for (int j = name_start; j < strlen(argv[i]); j++)
+                right_filename[j - name_start] = argv[i][j];
+            right_filename[strlen(argv[i]) - name_start] = '\0';
             fprintf(archive, "%s|%d|", right_filename, ftell(cur_file));
             fclose(cur_file);
         }
