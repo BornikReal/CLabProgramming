@@ -8,7 +8,7 @@ int main()
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
    freopen("multimap.in", "r", stdin);
-   freopen("multimap1.out", "w", stdout);
+   freopen("multimap.out", "w", stdout);
    MultiMap my_multi_map;
    string input, input1, input2;
    while (cin >> input)
