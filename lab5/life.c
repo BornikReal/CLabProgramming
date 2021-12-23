@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
                     if (max_iter != -2)
                         error_exit();
                     max_iter = strtol(argv[cur_arg + 1], NULL, 10);
-                    if (dump_freq < 1)
+                    if (max_iter < 1)
                         error_exit();
                 }
                 cur_arg += 2;

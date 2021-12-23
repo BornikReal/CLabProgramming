@@ -3,12 +3,23 @@
 #include <string.h>
 #include <dirent.h>
 
+/**
+ * @brief Вывод сообщения об ошибке
+ * 
+ */
 void error_exit()
 {
     printf("Неправильно введены аргументы. Используйте \"expander.exe -h\" для получения справки.");
     exit(1);
 }
 
+
+/**
+ * @brief Проверка коректности файла
+ * 
+ * @param file Указатель на файл
+ * @param filename Имя файла
+ */
 void check_file(FILE* file, char* filename) {
     if (!file) {
         printf("Файл \"%s\" не найден.", filename);
