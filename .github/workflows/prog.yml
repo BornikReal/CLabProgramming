@@ -13,8 +13,8 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Install googletests
         run: |
-            cd /usr/src/gtest
             sudo apt-get install libgtest-dev
+            cd /usr/src/gtest
             sudo cmake CMakeLists.txt
             sudo make
             sudo cp *.a /usr/lib
