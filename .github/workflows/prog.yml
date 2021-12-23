@@ -29,7 +29,7 @@ jobs:
       - name: Compile main
         run: |
             g++ ./MultiMap/main.cpp -o ./MultiMap/main
-            x86_64-w64-mingw32-gcc -o ./MultiMap/main.exe ./MultiMap/main.c
+            x86_64-w64-mingw32-gcc -o ./MultiMap/main.exe ./MultiMap/main.cpp
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
