@@ -34,7 +34,7 @@ private:
             if (set_container[search][i]->value == x)
                 return i;
         }
-        return -1;
+        return 1;
     }
     string linked_set_members(cell *cur, string result = "")
     {
