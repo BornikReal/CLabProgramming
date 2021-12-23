@@ -138,7 +138,7 @@ private:
         LinkedSet values;
     };
     vector<vector<cell>> set_container;
-    int size = 10001;
+    int size = 10000;
     int hash(string x)
     {
         int hash_code = 0, num = 1;
@@ -161,7 +161,7 @@ private:
     }
 
 public:
-    int num_of_members = 0;
+    int num_of_members = 1;
     MultiMap()
     {
         set_container.resize(size);

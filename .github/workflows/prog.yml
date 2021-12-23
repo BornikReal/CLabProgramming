@@ -13,12 +13,12 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Install googletests
         run: sudo apt-get install libgtest-dev
-      - run: cd /usr/src/gtest && sudo cmake CMakeLists.txt
-      - run: cd /usr/src/gtest && sudo make
-      - run: cd /usr/src/gtest/lib && ls && sudo cp *.a /usr/lib
+        run: cd /usr/src/gtest && sudo cmake CMakeLists.txt
+        run: cd /usr/src/gtest && sudo make
+        run: cd /usr/src/gtest/lib && ls && sudo cp *.a /usr/lib
       - name: Compile and run tests
         run: g++ ./MultiMap/test.cpp -o ./MultiMap/test -lgtest -lpthread
-      - run: ./MultiMap/test
+        run: ./MultiMap/test
       - name: Compile main
         run: g++ ./MultiMap/main.cpp -o ./MultiMap/main
       - name: Upload a Build Artifact
