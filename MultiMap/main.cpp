@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include "multimap.h"
 using namespace std;
 
@@ -27,7 +26,7 @@ int main()
        else if (input == "deleteall")
            my_multi_map.multi_map_deleteall(input1);
        else if (input == "get")
-           my_multi_map.multi_map_get(input1);
+           cout << my_multi_map.multi_map_get(input1) << endl;
    }
    return 0;
 }
