@@ -100,3 +100,8 @@ TEST(MultiMapTest, MapDeletAndPutTest) {
     EXPECT_EQ("3 4 2 1", TestMap.multi_map_get("4"));
     EXPECT_EQ("4 5 3 2 1", TestMap.multi_map_get("5"));
 }
+
+int main() {
+	testing::InitGoogleTest();
+	return RUN_ALL_TESTS();
+}
