@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "main.cpp"
+#include "multimap.h"
 
 TEST(MultiMapTest, SetSizeTest) {
     LinkedSet TestSet;
