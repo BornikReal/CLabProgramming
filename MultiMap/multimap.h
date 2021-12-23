@@ -34,7 +34,7 @@ private:
             if (set_container[search][i]->value == x)
                 return i;
         }
-        return 1;
+        return -1;
     }
     string linked_set_members(cell *cur, string result = "")
     {
@@ -138,7 +138,7 @@ private:
         LinkedSet values;
     };
     vector<vector<cell>> set_container;
-    int size = 10000;
+    int size = 10001;
     int hash(string x)
     {
         int hash_code = 0, num = 1;
