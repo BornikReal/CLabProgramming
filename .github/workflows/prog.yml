@@ -13,20 +13,26 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Install googletests
         run: |
+            cd /usr/src/gtest
             sudo apt-get install libgtest-dev
-            cd /usr/src/gtest && sudo cmake CMakeLists.txt
-            cd /usr/src/gtest && sudo make
-            cd /usr/src/gtest/lib && ls && sudo cp *.a /usr/lib
-      - name: Compile and run tests
+            sudo cmake CMakeLists.txt
+            sudo make
+            sudo cp *.a /usr/lib
+      - name: Install Mingw
+        run: sudo apt-get install mingw-w64
+      - name: Run tests
         run: |
-            g++ ./MultiMap/test.cpp -o ./MultiMap/test -lgtest -lpthread
-            ./MultiMap/test
+            cd MultiMap
+            g++ ./test.cpp -o ./test -lgtest -lpthread
+            ./test
       - name: Compile main
-        run: g++ ./MultiMap/main.cpp -o ./MultiMap/main
+        run: |
+            g++ ./MultiMap/main.cpp -o ./MultiMap/main
+            x86_64-w64-mingw32-gcc -o ./MultiMap/main.exe ./MultiMap/main.c
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
             name: build
             path: |
-              ./MultiMap/main
-              ./MultiMap/test
+                ./MultiMap/main
+                ./MultiMap/main.exe
