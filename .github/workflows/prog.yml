@@ -15,7 +15,7 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Compile and run tests
         run: g++ ./MultiMap/test.cpp -o ./MultiMap/test -lgtest -lpthread
-      - run: ./test
+      - run: ./MultiMap/test
       - name: Compile main
         run: g++ ./MultiMap/main.cpp -o ./MultiMap/main
       - name: Upload a Build Artifact
