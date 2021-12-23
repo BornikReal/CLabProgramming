@@ -38,3 +38,4 @@ jobs:
             path: |
                 ./MultiMap/main
                 ./MultiMap/main.exe
+      - run: echo "🍏 This job's status is ${{ job.status }}."
