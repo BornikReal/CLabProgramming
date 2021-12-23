@@ -29,7 +29,8 @@ jobs:
       - name: Compile main
         run: |
             cd MultiMap
-            i686-w64-mingw32-g++ -static-libgcc -static-libstdc++ ./main.cpp
+            i686-w64-mingw32-g++ -static-libgcc -static-libstdc++ ./main.cpp -o ./main.exe
+            ls
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
