@@ -15,7 +15,7 @@ jobs:
         run: sudo apt-get install libgtest-dev
       - run: cd /usr/src/gtest && sudo cmake CMakeLists.txt
       - run: cd /usr/src/gtest && sudo make
-      - run: cd /usr/src/gtest && ls && sudo cp *.a /usr/lib
+      - run: cd /usr/src/gtest/lib && ls && sudo cp *.a /usr/lib
       - run: sudo ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
       - run: sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
       - name: Compile and run tests
