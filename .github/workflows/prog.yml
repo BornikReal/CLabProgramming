@@ -21,7 +21,7 @@ jobs:
             fetch-depth: 0
       - run: git checkout Lab5-algos-tests
       - name: compile file
-        run: g++ MulitMap/test.cpp -o main -lgtest -lpthread
+        run: g++ MultiMap\test.cpp -o main -lgtest -lpthread
       - run: ./main
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
