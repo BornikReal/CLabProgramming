@@ -1,11 +1,7 @@
-#include "gtest/gtest.h"
-#include "main.cpp"
+#include <gtest/gtest.h>
+#include "multimap.h"
 
-class MultiMapTest : public ::testing::Test {
-
-};
-
-TEST_F(MultiMapTest, SetSizeTest) {
+TEST(MultiMapTest, SetSizeTest) {
     LinkedSet TestSet;
     EXPECT_EQ(0, TestSet.num_of_mem);
     for (int i = 0; i < 10000; i++)
@@ -15,7 +11,7 @@ TEST_F(MultiMapTest, SetSizeTest) {
     EXPECT_EQ(0, TestSet.num_of_mem);
 }
 
-TEST_F(MultiMapTest, SetDeletAndPutTest) {
+TEST(MultiMapTest, SetDeletAndPutTest) {
     LinkedSet TestSet;
     TestSet.linked_set_put("1");
     TestSet.linked_set_put("2");
@@ -47,7 +43,7 @@ TEST_F(MultiMapTest, SetDeletAndPutTest) {
 }
 
 
-TEST_F(MultiMapTest, MapSizeTest) {
+TEST(MultiMapTest, MapSizeTest) {
     MultiMap TestMap;
     EXPECT_EQ(0, TestMap.num_of_members);
     for (int i = 0; i < 10000; i++)
@@ -63,7 +59,7 @@ TEST_F(MultiMapTest, MapSizeTest) {
     EXPECT_EQ(0, TestMap.num_of_members);
 }
 
-TEST_F(MultiMapTest, MapDeletAndPutTest) {
+TEST(MultiMapTest, MapDeletAndPutTest) {
     MultiMap TestMap;
     EXPECT_EQ("0", TestMap.multi_map_get("0"));
     for (int i = 1; i <= 5; i++)
@@ -103,4 +99,9 @@ TEST_F(MultiMapTest, MapDeletAndPutTest) {
     EXPECT_EQ("2 3 1", TestMap.multi_map_get("3"));
     EXPECT_EQ("3 4 2 1", TestMap.multi_map_get("4"));
     EXPECT_EQ("4 5 3 2 1", TestMap.multi_map_get("5"));
+}
+
+int main() {
+	testing::InitGoogleTest();
+	return RUN_ALL_TESTS();
 }
