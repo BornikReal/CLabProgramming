@@ -16,7 +16,7 @@ jobs:
       - run: cd /usr/src/gtest
       - run: ls
       - run: sudo cmake /usr/src/gtest/CMakeLists.txt
-      - run: sudo make
+      - run: sudo /usr/src/gtest/make
       - run: sudo cp *.a /usr/lib
       - run: sudo ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
       - run: sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
