@@ -1,5 +1,9 @@
 name: GitHub Actions
-on: [push]
+on:
+  push:
+    branches:
+      - Lab5-algos-develop
+      - Lab5-algos-release
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
